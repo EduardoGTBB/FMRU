@@ -20,7 +20,7 @@ $proximos_eventos = [
     ["torneo" => "Liga de Occidente Femenil - Semifinal", "equipo_local" => "Lobos Occidente", "equipo_visitante" => "Rhinos RC", "fecha" => "24 Octubre, 2026", "hora" => "14:00 hrs", "sede" => "Parque Metropolitano, GDL"],
 ];
 
-// Datos simulados para el directorio (Con coordenadas para el mapa)
+// Directorio Completo de Clubes (Basado en el listado de FMRU)
 $clubes_muestra = [
     ["nombre" => "Black Thunder RC", "categoria" => "Mayor Varonil / Femenil", "estado" => "Ciudad de México", "entrenamiento" => "Mar y Jue: 20:00 hrs. Deportivo Xochimilco", "contacto" => "contacto@blackthunder.com", "redes" => ["facebook" => "#", "instagram" => "#"], "lat" => 19.2644, "lng" => -99.1036],
     ["nombre" => "Lobos Occidente", "categoria" => "Infantil / Juvenil", "estado" => "Jalisco", "entrenamiento" => "Lun y Mié: 18:00 hrs. Parque Metropolitano", "contacto" => "info@lobosrugby.mx", "redes" => ["facebook" => "#"], "lat" => 20.6720, "lng" => -103.4357],
@@ -33,7 +33,26 @@ $clubes_muestra = [
     ["nombre" => "Jaguares Fes", "categoria" => "Universitario Varonil", "estado" => "Estado de México", "entrenamiento" => "Lun y Jue: 15:00 hrs. FES Acatlán", "contacto" => "jaguares@unam.mx", "redes" => ["facebook" => "#"], "lat" => 19.4891, "lng" => -99.2452],
     ["nombre" => "Leones RC", "categoria" => "Infantil / Juvenil", "estado" => "Ciudad de México", "entrenamiento" => "Sab: 10:00 hrs. Bosque de Tlalpan", "contacto" => "contacto@leones.mx", "redes" => ["instagram" => "#", "facebook" => "#"], "lat" => 19.2900, "lng" => -99.1900],
     ["nombre" => "Gladiadores del Sur", "categoria" => "Mayor Varonil", "estado" => "Yucatán", "entrenamiento" => "Mie y Vie: 19:00 hrs.", "contacto" => "gladiadores@sur.com", "redes" => ["facebook" => "#"], "lat" => 20.9674, "lng" => -89.6236],
-    ["nombre" => "Espartanos", "categoria" => "Mayor Femenil", "estado" => "Guanajuato", "entrenamiento" => "Mar y Jue: 20:30 hrs.", "contacto" => "espartanas@gmail.com", "redes" => ["instagram" => "#"], "lat" => 21.1213, "lng" => -101.6826]
+    ["nombre" => "Espartanos", "categoria" => "Mayor Femenil", "estado" => "Guanajuato", "entrenamiento" => "Mar y Jue: 20:30 hrs.", "contacto" => "espartanas@gmail.com", "redes" => ["instagram" => "#"], "lat" => 21.1213, "lng" => -101.6826],
+    // -- Nuevos equipos integrados --
+    ["nombre" => "Wallabies RC", "categoria" => "Mayor Varonil", "estado" => "Estado de México", "entrenamiento" => "Mar y Jue: 20:00 hrs.", "contacto" => "wallabies@mx.com", "redes" => ["facebook" => "#"], "lat" => 19.5303, "lng" => -99.2200],
+    ["nombre" => "Templarios RC", "categoria" => "Mayor Varonil / Femenil", "estado" => "Ciudad de México", "entrenamiento" => "Lun y Mié: 19:30 hrs.", "contacto" => "templarios@rugby.com", "redes" => ["facebook" => "#", "instagram" => "#"], "lat" => 19.4326, "lng" => -99.1332],
+    ["nombre" => "Cumiyais Monterrey", "categoria" => "Mayor Varonil", "estado" => "Nuevo León", "entrenamiento" => "Sáb: 10:00 hrs.", "contacto" => "cumiyais@mty.com", "redes" => ["facebook" => "#"], "lat" => 25.6866, "lng" => -100.3161],
+    ["nombre" => "Roosters Querétaro", "categoria" => "Infantil / Juvenil", "estado" => "Querétaro", "entrenamiento" => "Mar y Jue: 18:00 hrs.", "contacto" => "roosters@qro.com", "redes" => ["instagram" => "#"], "lat" => 20.5881, "lng" => -100.3899],
+    ["nombre" => "Celaya RC", "categoria" => "Mayor Varonil", "estado" => "Guanajuato", "entrenamiento" => "Mié y Vie: 19:00 hrs.", "contacto" => "celayarc@gmail.com", "redes" => ["facebook" => "#"], "lat" => 20.5223, "lng" => -100.8122],
+    ["nombre" => "Bisontes Guadalajara", "categoria" => "Mayor Varonil / Femenil", "estado" => "Jalisco", "entrenamiento" => "Lun y Jue: 20:30 hrs.", "contacto" => "bisontes@gdl.com", "redes" => ["facebook" => "#"], "lat" => 20.6597, "lng" => -103.3496],
+    ["nombre" => "Hammerheads Cancún", "categoria" => "Mayor Varonil", "estado" => "Quintana Roo", "entrenamiento" => "Mar y Jue: 19:00 hrs.", "contacto" => "hammerheads@cancun.com", "redes" => ["facebook" => "#", "instagram" => "#"], "lat" => 21.1610, "lng" => -86.8250],
+    ["nombre" => "Jaguares Colima", "categoria" => "Universitario Varonil", "estado" => "Colima", "entrenamiento" => "Lun y Mié: 17:00 hrs.", "contacto" => "jaguares@colima.com", "redes" => ["instagram" => "#"], "lat" => 19.2433, "lng" => -103.7249],
+    ["nombre" => "Legión Cuervos", "categoria" => "Mayor Varonil / Femenil", "estado" => "Ciudad de México", "entrenamiento" => "Mar y Jue: 21:00 hrs.", "contacto" => "cuervos@cdmx.com", "redes" => ["facebook" => "#"], "lat" => 19.3400, "lng" => -99.1500],
+    ["nombre" => "Tazmania RC", "categoria" => "Infantil / Juvenil", "estado" => "Ciudad de México", "entrenamiento" => "Sáb: 08:30 hrs.", "contacto" => "tazmania@rc.com", "redes" => ["facebook" => "#"], "lat" => 19.3900, "lng" => -99.1600],
+    ["nombre" => "Quetzales RC", "categoria" => "Mayor Varonil", "estado" => "Puebla", "entrenamiento" => "Lun y Mié: 20:00 hrs.", "contacto" => "quetzales@puebla.com", "redes" => ["instagram" => "#"], "lat" => 19.0414, "lng" => -98.2063],
+    ["nombre" => "Borregos Puebla", "categoria" => "Universitario Varonil", "estado" => "Puebla", "entrenamiento" => "Mar y Jue: 16:00 hrs.", "contacto" => "borregos@puebla.mx", "redes" => ["facebook" => "#"], "lat" => 19.0196, "lng" => -98.2425],
+    ["nombre" => "Abejas Guanajuato", "categoria" => "Universitario Femenil", "estado" => "Guanajuato", "entrenamiento" => "Lun y Jue: 18:00 hrs.", "contacto" => "abejas@ugto.mx", "redes" => ["instagram" => "#"], "lat" => 21.0190, "lng" => -101.2574],
+    ["nombre" => "Saltillo RC", "categoria" => "Mayor Varonil", "estado" => "Coahuila", "entrenamiento" => "Mar y Jue: 20:30 hrs.", "contacto" => "saltillo@rc.com", "redes" => ["facebook" => "#"], "lat" => 25.4216, "lng" => -100.9990],
+    ["nombre" => "Cimarrones UABC", "categoria" => "Universitario Varonil", "estado" => "Baja California", "entrenamiento" => "Lun y Mié: 17:30 hrs.", "contacto" => "cimarrones@uabc.mx", "redes" => ["facebook" => "#", "instagram" => "#"], "lat" => 32.5149, "lng" => -117.0382],
+    ["nombre" => "ITESO Rugby", "categoria" => "Universitario Varonil / Femenil", "estado" => "Jalisco", "entrenamiento" => "Mar y Jue: 19:00 hrs.", "contacto" => "rugby@iteso.mx", "redes" => ["instagram" => "#"], "lat" => 20.6083, "lng" => -103.4146],
+    ["nombre" => "Coyotes Coyoacán", "categoria" => "Mayor Varonil", "estado" => "Ciudad de México", "entrenamiento" => "Lun y Mié: 20:00 hrs.", "contacto" => "coyotes@cdmx.com", "redes" => ["facebook" => "#"], "lat" => 19.3500, "lng" => -99.1620],
+    ["nombre" => "Ocelotes Aguascalientes", "categoria" => "Mayor Varonil", "estado" => "Aguascalientes", "entrenamiento" => "Mar y Jue: 19:30 hrs.", "contacto" => "ocelotes@ags.com", "redes" => ["facebook" => "#", "instagram" => "#"], "lat" => 21.8853, "lng" => -102.2916]
 ];
 
 // Simulamos logos de patrocinadores (Imágenes Placeholder)
@@ -68,45 +87,13 @@ $sponsors = [
     
     <!-- Integración Leaflet CSS (Propuesta para mapa interactivo seguro y gratuito) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
-    <style>
-        :root {
-            /* COLORES PRIMARIOS FMRU */
-            --verde-principal: #116436; /* Abundant Green */
-            --rojo-institucional: #bf2333; /* True Red */
-            
-            /* COLORES SECUNDARIOS FMRU */
-            --verde-claro: #7fb069;     /* Grass Green */
-            --verde-oscuro: #004323;    /* Formal Garden */
-            --rojo-oscuro: #792128;     /* Dahlia */
-            
-            /* NEUTRALES */
-            --negro-nav: #000000;       /* Process Black */
-            --azul-oscuro: #111111;     /* Oscuro general para títulos */
-            --gris-fondo: #f8f9fa;
-        }
 
-        body { 
-            font-family: 'Open Sans', Arial, sans-serif; 
-            background-color: var(--gris-fondo); 
-        }
+    <!-- Enlace a estilos globales -->
+    <link rel="stylesheet" href="assets/css/styles.css">
 
-        .bg-verde-principal { background-color: var(--verde-principal) !important; color: white; }
-        
-        .btn-rojo { background-color: var(--rojo-institucional); color: white; font-weight: 600; border: none; transition: all 0.3s ease; }
-        /* Efecto Hover usando Dahlia (Rojo oscuro FMRU) */
-        .btn-rojo:hover { background-color: var(--rojo-oscuro); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(121, 33, 40, 0.3); }
-
-        .navbar-custom { background-color: var(--verde-principal); }
-        .navbar-custom .nav-link { color: white; text-transform: uppercase; font-weight: 600; font-size: 0.9rem;}
-        .navbar-custom .nav-link:hover { color: var(--verde-claro); }
-        
+    <!-- <style>
+        /* Estilos específicos de index.php */
         .carousel-item { height: 65vh; min-height: 450px; background-color: var(--negro-nav); color: white; }
-        
-        /* Títulos en Extrabold (800) según manual */
-        .section-title-main { font-weight: 800; text-transform: uppercase; border-bottom: 4px solid var(--verde-claro); padding-bottom: 5px; margin-bottom: 2rem; color: var(--verde-principal) !important; }
-
-        /* Estilos Noticias (P2) */
         .section-title-mag { font-weight: 800; color: var(--rojo-institucional); text-transform: uppercase; border-bottom: 2px solid var(--verde-claro); padding-bottom: 10px; margin-bottom: 0;}
         .btn-view-all { background-color: var(--rojo-institucional); color: white; font-weight: 600; border-radius: 2px; transition: all 0.3s ease; }
         .btn-view-all:hover { background-color: var(--rojo-oscuro); color: white; }
@@ -120,8 +107,6 @@ $sponsors = [
         .press-number { width: 28px; height: 28px; background-color: var(--rojo-institucional); color: white; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
         .press-list h6 { font-size: 0.95rem; font-weight: 600; color: var(--negro-nav); line-height: 1.4; margin-top: 4px; transition: all 0.2s;}
         .press-list h6:hover { color: var(--rojo-institucional); cursor: pointer; }
-
-        /* Estilos Próximos Eventos (P3) */
         .events-container { background-color: #2b2b2b; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
         .events-nav-tabs .nav-link { color: #888; font-weight: 800; text-transform: uppercase; border: none; border-radius: 0; padding: 1rem; background-color: #1a1a1a; letter-spacing: 1px; transition: all 0.3s ease;}
         .events-nav-tabs .nav-link:hover { color: var(--rojo-institucional); background-color: #222; }
@@ -134,17 +119,10 @@ $sponsors = [
         .event-details { font-size: 0.85rem; color: #bbb; }
         .btn-view-all-events { background-color: var(--rojo-institucional); color: white; border-radius: 0; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; }
         .btn-view-all-events:hover { background-color: var(--rojo-oscuro); color: white; }
-
-        /* Estilos Directorio (P4 - Tabla) */
-        .section-title { font-weight: 800; color: var(--azul-oscuro); display: inline-block; margin-bottom: 0; text-transform: uppercase; border-bottom: 4px solid var(--verde-claro); padding-bottom: 5px; }
         .directorio-table th { background-color: var(--verde-principal); color: white; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; border: none; }
         .directorio-table td { vertical-align: middle; font-size: 0.9rem; font-weight: 400;}
         .club-logo-placeholder { width: 45px; height: 45px; background-color: var(--gris-fondo); border: 2px solid var(--verde-claro); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--verde-principal); font-weight: 800; }
-
-        /* Mapa */
         #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; border: 2px solid var(--verde-claro); }
-
-        /* Contenedor principal de sponsors */
         .seccion-sponsors { background-color: #212529; padding: 60px 0 20px 0; text-align: center; overflow: hidden; }
         .titulo-sponsors { color: var(--verde-claro); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; font-weight: 800;}
         .sponsors-principales { display: flex; justify-content: center; align-items: center; gap: 60px; margin-bottom: 40px; }
@@ -158,23 +136,15 @@ $sponsors = [
         .contenedor-boton { margin-top: 50px; }
         .btn-quiero-sponsor { background-color: transparent; border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 12px 30px; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 6px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; }
         .btn-quiero-sponsor:hover { background-color: rgba(255,255,255,0.1); border-color: #ffffff; color: #ffffff; }
-
-        /* P5: Efectos Footer */
-        .custom-hover-link { transition: color 0.2s ease-in-out; }
-        .custom-hover-link:hover { color: var(--verde-claro) !important; }
-        .hover-white:hover { color: white !important; }
-        .transition-scale { transition: transform 0.2s ease-in-out; display: inline-block; }
-        .transition-scale:hover { transform: scale(1.15); color: var(--verde-claro) !important; }
-    </style>
+    </style> -->
 </head>
 <body>
 
-    <!-- BARRA SUPERIOR Y MENÚ -->
+    <!-- BARRA SUPERIOR Y MENÚ 
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top shadow-sm">
         <div class="container">
-            <!-- Logo con márgenes seguros según manual de identidad (padding y object-fit) -->
             <a class="navbar-brand bg-white p-2 rounded" href="#">
-                <img src="rugby-mexico-logo.png" alt="Logo FMRU" height="50" style="object-fit: contain;">
+                <img src="assets/img/logo/rugby-mexico-logo.png" alt="Logo FMRU" height="50" style="object-fit: contain;">
             </a>
             <button class="navbar-toggler border-white text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <i class="bi bi-list fs-1"></i>
@@ -185,9 +155,9 @@ $sponsors = [
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Federación</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Quiénes Somos (Misión/Visión)</a></li>
-                            <li><a class="dropdown-item" href="#">Historia + Presidencia</a></li>
-                            <li><a class="dropdown-item" href="#">Mesa Directiva + Plan</a></li>
+                            <li><a class="dropdown-item" href="quienes-somos.php">Quiénes Somos (Misión/Visión)</a></li>
+                            <li><a class="dropdown-item" href="historia-presidencia.php">Historia + Presidencia</a></li>
+                            <li><a class="dropdown-item" href="mesa-directiva.php">Mesa Directiva + Plan</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -209,15 +179,15 @@ $sponsors = [
                     <li class="nav-item"><a class="nav-link" href="#">Documentos</a></li>
                 </ul>
                 <div class="d-flex">
-                    <!-- Redirección directa a Sport Plus -->
-                    <a href="URL_REGISTRO_SPORTPLUS" class="btn btn-rojo rounded-pill px-4"><i class="bi bi-person-circle me-1"></i> Regístrate / Ingresar</a>
+                    <a href="https://sportsplus.app/public/6859/registration" target="_blank" class="btn btn-rojo rounded-pill px-4"><i class="bi bi-person-circle me-1"></i> Regístrate / Ingresar</a>
                 </div>
             </div>
         </div>
-    </nav>
+    </nav>-->
 
-    <!-- P1: BANNER ROTATIVO (HERO) -->
-    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+    <?php include 'includes/navbar.php'; ?>
+
+    <!-- P1 - BANNER ROTATIVO -->
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -256,7 +226,7 @@ $sponsors = [
         </button>
     </div>
 
-    <!-- CAMBIO DE ORDEN: P3 (CALENDARIO) AHORA VA PRIMERO -->
+    <!-- P2 - PROXIMOS EVENTOS -->
     <section class="container my-5">
         <h2 class="section-title-main">Calendario FMRU</h2>
         <div class="row justify-content-center">
@@ -309,7 +279,7 @@ $sponsors = [
         </div>
     </section>
 
-    <!-- CAMBIO DE ORDEN: P2 (NOTICIAS) AHORA VA DESPUÉS -->
+    <!-- P3 - NOTICIAS -->
     <section class="container my-5">
         <div class="row g-5">
             <div class="col-lg-8">
@@ -355,7 +325,7 @@ $sponsors = [
             </div>
 
             <div class="col-lg-4">
-                <h2 class="section-title-mag mb-4">Gacetillas de Prensa</h2>
+                <h2 class="section-title-mag mb-4">Comunicados de Prensa</h2>
                 <ul class="list-group list-group-flush press-list">
                     <li class="list-group-item d-flex align-items-start">
                         <div class="press-number me-3 flex-shrink-0">1</div>
@@ -382,7 +352,7 @@ $sponsors = [
         </div>
     </section>
 
-    <!-- P4: DIRECTORIO DE CLUBES (TABLA + MAPA + PAGINACIÓN COMPLETA) -->
+    <!-- P4 - DIRECTORIO DE CLUBES (TABLA + MAPA) -->
     <section class="container my-5" id="directorio-section">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 border-bottom pb-3" style="border-color: var(--verde-claro) !important;">
             <div class="mb-3 mb-lg-0">
@@ -395,13 +365,20 @@ $sponsors = [
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
                     <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Buscar equipo..." aria-label="Buscar equipo">
                 </div>
+                <!-- Filtros actualizados con todos los estados de la base de datos de muestra -->
                 <select id="stateFilter" class="form-select">
                     <option value="all" selected>Todos los Estados</option>
+                    <option value="Aguascalientes">Aguascalientes</option>
+                    <option value="Baja California">Baja California</option>
                     <option value="Ciudad de México">Ciudad de México</option>
+                    <option value="Coahuila">Coahuila</option>
+                    <option value="Colima">Colima</option>
                     <option value="Estado de México">Estado de México</option>
                     <option value="Guanajuato">Guanajuato</option>
                     <option value="Jalisco">Jalisco</option>
                     <option value="Nuevo León">Nuevo León</option>
+                    <option value="Puebla">Puebla</option>
+                    <option value="Querétaro">Querétaro</option>
                     <option value="Quintana Roo">Quintana Roo</option>
                     <option value="Yucatán">Yucatán</option>
                 </select>
@@ -482,7 +459,7 @@ $sponsors = [
         </div>
     </section>
 
-    <!-- SECCIÓN: PATROCINADORES -->
+    <!-- P5 - PATROCINADORES -->
     <section class="seccion-sponsors">
         <h3 class="titulo-sponsors">NUESTROS SPONSORS</h3>
         <div class="sponsors-principales">
@@ -505,12 +482,14 @@ $sponsors = [
         </div>
     </section>
 
-    <!-- P5: FOOTER -->
+    <?php include 'includes/footer.php'; ?>
+
+    <!-- P6 - FOOTER 
     <footer class="bg-dark text-white pt-5 pb-3 border-top" style="border-color: var(--verde-claro) !important; border-width: 5px !important;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-5 col-md-6 mb-4">
-                    <img src="rugby-mexico-logo.png" alt="Logo Rugby México" height="60" class="mb-3 bg-white p-2 rounded" style="object-fit: contain;">
+                    <img src="assets/img/logo/rugby-mexico-logo.png" alt="Logo Rugby México" height="60" class="mb-3 bg-white p-2 rounded" style="object-fit: contain;">
                     <h6 class="fw-bold mb-2">FEDERACIÓN MEXICANA DE RUGBY, A.C.</h6>
                     <p class="small text-light text-opacity-75 pe-md-4 lh-lg">
                         <i class="bi bi-geo-alt-fill text-danger me-2"></i>
@@ -564,11 +543,9 @@ $sponsors = [
                 </div>
             </div>
         </div>
-    </footer>
+    </footer>-->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Integración Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <script>
@@ -600,7 +577,9 @@ $sponsors = [
                 let bounds = [];
 
                 tableRows.forEach(row => {
-                    if (!row.classList.contains('d-none')) {
+                    // CAMBIO CLAVE: Ahora leemos una clase lógica ('match-filter') en lugar de la visual ('d-none')
+                    // Esto permite que el mapa muestre equipos aunque estén ocultos por la paginación de la tabla
+                    if (row.classList.contains('match-filter')) {
                         let lat = parseFloat(row.getAttribute('data-lat'));
                         let lng = parseFloat(row.getAttribute('data-lng'));
                         let nombre = row.getAttribute('data-nombre');
@@ -613,12 +592,14 @@ $sponsors = [
                     }
                 });
 
+                // Ajustar el zoom del mapa según los puntos encontrados
                 if (bounds.length > 0) {
                     map.fitBounds(bounds, {padding: [50, 50], maxZoom: 10});
                 } else {
-                    map.setView([23.6345, -102.5528], 5);
+                    map.setView([23.6345, -102.5528], 5); // Vista general de México
                 }
 
+                // Manejo UI del Botón "Cargar Más" / "Mostrar Menos"
                 const searchInput = document.getElementById('searchInput');
                 const stateFilter = document.getElementById('stateFilter');
                 
@@ -629,6 +610,7 @@ $sponsors = [
                     noResultsMsg.classList.add('d-none');
                     
                     if (searchInput.value.trim() !== '' || stateFilter.value !== 'all') {
+                        // Ocultar botón si hay filtros (la tabla muestra todo lo encontrado sin paginar)
                         loadMoreContainer.classList.add('d-none');
                     } else {
                         loadMoreContainer.classList.remove('d-none');
@@ -679,7 +661,9 @@ $sponsors = [
 
                     if (matchesSearch && matchesState) {
                         matchCount++;
+                        row.classList.add('match-filter'); // Etiqueta lógica para el mapa
                         
+                        // Lógica visual de paginación para la tabla
                         if (searchTerm !== '' || selectedState !== 'all' || isShowingAll) {
                              row.classList.remove('d-none');
                         } else {
@@ -687,11 +671,12 @@ $sponsors = [
                                 row.classList.remove('d-none');
                                 visibleCount++;
                             } else {
-                                row.classList.add('d-none');
+                                row.classList.add('d-none'); // Oculto en tabla, pero el mapa lo leerá
                             }
                         }
                     } else {
-                        row.classList.add('d-none');
+                        row.classList.remove('match-filter'); // Lo quitamos del mapa
+                        row.classList.add('d-none');          // Lo quitamos de la tabla
                     }
                 });
                 
@@ -705,16 +690,33 @@ $sponsors = [
                 stateFilter.addEventListener('change', filterTable);
             }
 
-            if(btnLoadMore) {
-                btnLoadMore.addEventListener('click', function() {
+            if (btnLoadMore) {
+                btnLoadMore.addEventListener('click', function(e) {
+                    e.preventDefault(); // Evita cualquier salto nativo del botón
+                    
                     if (isShowingAll) {
+                        // Estado "Mostrar Menos"
                         visibleLimit = inicialLimit;
                         isShowingAll = false;
-                        document.getElementById('directorio-section').scrollIntoView({ behavior: 'smooth' });
+                        
+                        // Refiltramos la tabla para ocultar los registros
+                        filterTable();
+                        
+                        // [UX FIX]: En lugar de scrollear a toda la sección, scrolleamos suavemente 
+                        // directo al inicio de la TABLA, restando un pequeño offset (ej. 100px) 
+                        // para que el título "ENCUENTRA TU CLUB" y los filtros queden a la vista.
+                        const tableHeaderOffset = document.getElementById('directorio-section').getBoundingClientRect().top + window.scrollY - 100;
+                        
+                        window.scrollTo({
+                            top: tableHeaderOffset,
+                            behavior: 'smooth'
+                        });
+
                     } else {
+                        // Estado "Cargar Más"
                         visibleLimit += increment;
+                        filterTable();
                     }
-                    filterTable();
                 });
             }
         });

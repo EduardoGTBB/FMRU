@@ -1,0 +1,229 @@
+:root {
+    /* COLORES PRIMARIOS FMRU */
+    --verde-principal: #116436; 
+    --rojo-institucional: #bf2333; 
+    
+    /* COLORES SECUNDARIOS FMRU */
+    --verde-claro: #7fb069;     
+    --verde-oscuro: #004323;    
+    --rojo-oscuro: #792128;     
+    
+    /* NEUTRALES */
+    --negro-nav: #000000;       
+    --azul-oscuro: #111111;     
+    --gris-fondo: #f8f9fa;
+}
+
+body { 
+    font-family: 'Open Sans', Arial, sans-serif; 
+    background-color: var(--gris-fondo); 
+}
+
+/* =========================================
+   COMPONENTES GLOBALES (Botones, Títulos)
+   ========================================= */
+.bg-verde-principal { background-color: var(--verde-principal) !important; color: white; }
+
+.btn-rojo { background-color: var(--rojo-institucional); color: white; font-weight: 600; border: none; transition: all 0.3s ease; }
+.btn-rojo:hover { background-color: var(--rojo-oscuro); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(121, 33, 40, 0.3); }
+
+.section-title-main { font-weight: 800; text-transform: uppercase; border-bottom: 4px solid var(--verde-claro); padding-bottom: 5px; margin-bottom: 2rem; color: var(--verde-principal) !important; }
+.section-title { font-weight: 800; color: var(--azul-oscuro); display: inline-block; margin-bottom: 0; text-transform: uppercase; border-bottom: 4px solid var(--verde-claro); padding-bottom: 5px; }
+
+/* =========================================
+   NAVBAR Y FOOTER
+   ========================================= */
+.navbar-custom { background-color: var(--verde-principal); }
+.navbar-custom .nav-link { color: white; text-transform: uppercase; font-weight: 600; font-size: 0.9rem;}
+.navbar-custom .nav-link:hover { color: var(--verde-claro); }
+
+.custom-hover-link { transition: color 0.2s ease-in-out; }
+.custom-hover-link:hover { color: var(--verde-claro) !important; }
+.hover-white:hover { color: white !important; }
+.transition-scale { transition: transform 0.2s ease-in-out; display: inline-block; }
+.transition-scale:hover { transform: scale(1.15); color: var(--verde-claro) !important; }
+
+
+/* =========================================
+   INDEX: INICIO
+   ========================================= */
+.carousel-item { height: 65vh; min-height: 450px; background-color: var(--negro-nav); color: white; }
+
+/* Calendario */
+.events-container { background-color: #2b2b2b; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.events-nav-tabs .nav-link { color: #888; font-weight: 800; text-transform: uppercase; border: none; border-radius: 0; padding: 1rem; background-color: #1a1a1a; letter-spacing: 1px; transition: all 0.3s ease;}
+.events-nav-tabs .nav-link:hover { color: var(--rojo-institucional); background-color: #222; }
+.events-nav-tabs .nav-link.active { background-color: var(--rojo-institucional); color: white; border: none; }
+.event-row { border-bottom: 1px solid #404040; transition: background-color 0.2s; }
+.event-row:last-child { border-bottom: none; }
+.event-row:hover { background-color: #333; }
+.event-tournament { font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
+.event-teams { font-size: 1.25rem; font-weight: 800; color: white; }
+.event-details { font-size: 0.85rem; color: #bbb; }
+.btn-view-all-events { background-color: var(--rojo-institucional); color: white; border-radius: 0; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; }
+.btn-view-all-events:hover { background-color: var(--rojo-oscuro); color: white; }
+
+/* Noticias */
+.section-title-mag { font-weight: 800; color: var(--rojo-institucional); text-transform: uppercase; border-bottom: 2px solid var(--verde-claro); padding-bottom: 10px; margin-bottom: 0;}
+.btn-view-all { background-color: var(--rojo-institucional); color: white; font-weight: 600; border-radius: 2px; transition: all 0.3s ease; }
+.btn-view-all:hover { background-color: var(--rojo-oscuro); color: white; }
+.text-categoria { color: var(--verde-claro); font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.text-fecha { color: #6c757d; font-size: 0.8rem; }
+.main-article { background: white; transition: 0.2s; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.main-article h3 { font-size: 1.8rem; color: var(--rojo-institucional); font-weight: 800; }
+.small-article img { height: 160px; object-fit: cover; border-radius: 4px; }
+.small-article h6 { font-size: 1.1rem; color: var(--rojo-institucional); font-weight: 800; line-height: 1.3; }
+.press-list .list-group-item { background: transparent; border-color: #e9ecef; padding: 15px 0; }
+.press-number { width: 28px; height: 28px; background-color: var(--rojo-institucional); color: white; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+.press-list h6 { font-size: 0.95rem; font-weight: 600; color: var(--negro-nav); line-height: 1.4; margin-top: 4px; transition: all 0.2s;}
+.press-list h6:hover { color: var(--rojo-institucional); cursor: pointer; }
+
+/* Directorio */
+.directorio-table th { background-color: var(--verde-principal); color: white; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; border: none; }
+.directorio-table td { vertical-align: middle; font-size: 0.9rem; font-weight: 400;}
+.club-logo-placeholder { width: 45px; height: 45px; background-color: var(--gris-fondo); border: 2px solid var(--verde-claro); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--verde-principal); font-weight: 800; }
+#map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; border: 2px solid var(--verde-claro); }
+
+/* Sponsors */
+.seccion-sponsors { background-color: #212529; padding: 60px 0 20px 0; text-align: center; overflow: hidden; }
+.titulo-sponsors { color: var(--verde-claro); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; font-weight: 800;}
+.sponsors-principales { display: flex; justify-content: center; align-items: center; gap: 60px; margin-bottom: 40px; }
+.sponsor-texto { color: #ffffff; font-size: 18px; font-weight: 600; }
+.divisor-sponsors { border: none; border-top: 1px solid rgba(255,255,255,0.1); width: 80%; margin: 0 auto 40px auto; }
+.marquee-contenedor { width: 100%; overflow: hidden; white-space: nowrap; position: relative; padding: 20px 0; }
+.marquee-contenido { display: inline-flex; align-items: center; gap: 40px; padding-right: 40px; animation: scrollSponsors 35s linear infinite; }
+.marquee-item { flex-shrink: 0; max-width: 140px; opacity: 0.7; filter: grayscale(100%); transition: all 0.3s ease; }
+.marquee-item:hover { filter: grayscale(0%); opacity: 1; }
+@keyframes scrollSponsors { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.contenedor-boton { margin-top: 50px; }
+.btn-quiero-sponsor { background-color: transparent; border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 12px 30px; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 6px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; }
+.btn-quiero-sponsor:hover { background-color: rgba(255,255,255,0.1); border-color: #ffffff; color: #ffffff; }
+
+
+/* =========================================
+   QUIÉNES SOMOS
+   ========================================= */
+.hero-background-quienes {
+    background-color: #ffffff; 
+    min-height: calc(100vh - 100px); 
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden; 
+}
+.hero-background-quienes::before {
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    /* Ajuste de ruta al estar en CSS */
+    background-image: url('../img/logo/Emblema verde de cuatro pétalos.png');
+    background-repeat: no-repeat;
+    background-position: right center; 
+    background-size: 80vh auto;
+    background-attachment: fixed; 
+    opacity: 0.12; /* Opacidad sutil como marca de agua */
+    z-index: 0; 
+}
+.institucional-header {
+    padding: 80px 0 60px;
+    width: 100%;
+    position: relative;
+    z-index: 1; 
+}
+.hero-background-quienes .titulo-principal, .hero-background-quienes .titulo-seccion { color: #111111 !important; font-weight: 800; text-transform: uppercase; margin-bottom: 1.5rem; }
+.hero-background-quienes .titulo-principal { font-size: 3.5rem; line-height: 1.1; }
+.hero-background-quienes .titulo-seccion { font-size: 2rem; margin-bottom: 1rem; }
+.hero-background-quienes .texto-cuerpo { color: #333333 !important; font-size: 1.1rem; line-height: 1.8; font-weight: 400; }
+.hero-background-quienes .badge-institucional { color: var(--verde-principal) !important; text-transform: uppercase; font-weight: 800; letter-spacing: 2px; font-size: 0.85rem; margin-bottom: 1rem; display: inline-block; }
+.hero-background-quienes .btn-conoce-mas { border: 2px solid var(--verde-principal); color: var(--verde-principal) !important; padding: 12px 25px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.hero-background-quienes .btn-conoce-mas:hover { background-color: var(--verde-principal); color: #ffffff !important; }
+
+/* DRIPS */
+.valores-container { margin-top: 60px; padding-bottom: 80px; }
+.drips-wrapper { display: flex; align-items: flex-end; height: 150px; overflow: hidden; position: relative; background-color: transparent; margin-top: 30px; }
+.drip-item { flex: 1; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; border-top-right-radius: 100px; box-shadow: -10px 0 20px rgba(0,0,0,0.5); }
+.drip-item span { color: white; font-size: 3rem; font-weight: 800; font-family: 'Open Sans', sans-serif; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+.drip-d { background-color: var(--verde-claro); z-index: 5; } 
+.drip-r { background-color: var(--verde-principal); z-index: 4; margin-left: -30px; } 
+.drip-i { background-color: var(--verde-oscuro); z-index: 3; margin-left: -30px; } 
+.drip-p { background-color: var(--rojo-oscuro); z-index: 2; margin-left: -30px; } 
+.drip-s { background-color: var(--rojo-institucional); z-index: 1; margin-left: -30px; } 
+
+.valores-lista { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 30px; }
+.hero-background-quienes .valor-tag { border: 1px solid #cccccc; color: #111111; background-color: #f8f9fa; padding: 10px 20px; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease; }
+.hero-background-quienes .valor-tag:hover { border-color: var(--rojo-institucional); background-color: rgba(191, 35, 51, 0.1); color: var(--rojo-institucional); }
+
+
+/* =========================================
+   HISTORIA Y PRESIDENCIA
+   ========================================= */
+.page-title { font-weight: 800; color: var(--verde-principal); text-transform: uppercase; border-bottom: 4px solid var(--verde-claro); padding-bottom: 5px; display: inline-block; margin-bottom: 2rem; }
+.hero-banner-historia { background-color: var(--negro-nav); color: white; padding: 60px 0; text-align: center; }
+.timeline { position: relative; max-width: 1200px; margin: 0 auto; padding-left: 50px; }
+.timeline::after { content: ''; position: absolute; width: 4px; background-color: #e9ecef; top: 0; bottom: 0; left: 23px; margin-left: -2px; }
+.timeline-item { position: relative; background-color: inherit; width: 100%; margin-bottom: 30px; }
+.timeline-item::after { content: ''; position: absolute; width: 20px; height: 20px; right: -10px; background-color: white; border: 4px solid var(--rojo-institucional); top: 15px; border-radius: 50%; z-index: 1; left: -37px; }
+.timeline-item:nth-child(even)::after { border-color: var(--verde-principal); }
+.timeline-item:nth-child(3n)::after { border-color: var(--verde-claro); }
+.timeline-content { padding: 20px 30px; background-color: white; position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 4px solid var(--verde-principal); }
+.president-card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: 100%; border-top: 4px solid var(--rojo-institucional); text-align: center; transition: transform 0.3s ease; }
+.president-card:hover { transform: translateY(-5px); }
+.president-year { color: #6c757d; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.president-name { color: var(--verde-principal); font-weight: 600; font-size: 1.1rem; margin: 0; }
+
+
+/* =========================================
+   MESA DIRECTIVA
+   ========================================= */
+.sub-title { font-weight: 800; color: var(--rojo-institucional); text-transform: uppercase; margin-bottom: 1rem; font-size: 1.25rem; }
+.hero-banner-directiva { background-color: var(--negro-nav); background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../img/banner/Mesa-de-trabajo-25.png'); background-size: cover; background-position: center; color: white; padding: 80px 0; text-align: center; }
+.info-card { background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: 100%; border-top: 4px solid var(--verde-claro); }
+.directiva-table th { background-color: var(--verde-principal); color: white; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px; border: none; padding: 15px; }
+.directiva-table td { vertical-align: middle; font-size: 1rem; padding: 15px; border-bottom: 1px solid #dee2e6; }
+.directiva-table tr:hover { background-color: rgba(127, 176, 105, 0.1); }
+.cargo-text { font-weight: 600; color: var(--verde-oscuro); }
+.persona-text { font-weight: 800; color: var(--negro-nav); }
+
+
+/*:root {
+    * COLORES PRIMARIOS FMRU *
+    --verde-principal: #116436; 
+    --rojo-institucional: #bf2333; 
+
+    * COLORES SECUNDARIOS FMRU *
+    --verde-claro: #7fb069;     
+    --verde-oscuro: #004323;    
+    --rojo-oscuro: #792128;     
+    
+    * NEUTRALES *
+    --negro-nav: #000000;       
+    --azul-oscuro: #111111;     
+    --gris-fondo: #f8f9fa;
+}
+
+body { 
+    font-family: 'Open Sans', Arial, sans-serif; 
+    background-color: var(--gris-fondo); 
+}
+
+* COMPONENTES GLOBALES *
+.bg-verde-principal { background-color: var(--verde-principal) !important; color: white; }
+
+.btn-rojo { background-color: var(--rojo-institucional); color: white; font-weight: 600; border: none; transition: all 0.3s ease; }
+.btn-rojo:hover { background-color: var(--rojo-oscuro); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(121, 33, 40, 0.3); }
+
+* NAVBAR *
+.navbar-custom { background-color: var(--verde-principal); }
+.navbar-custom .nav-link { color: white; text-transform: uppercase; font-weight: 600; font-size: 0.9rem;}
+.navbar-custom .nav-link:hover { color: var(--verde-claro); }
+
+* FOOTER Y UTILIDADES *
+.custom-hover-link { transition: color 0.2s ease-in-out; }
+.custom-hover-link:hover { color: var(--verde-claro) !important; }
+.hover-white:hover { color: white !important; }
+.transition-scale { transition: transform 0.2s ease-in-out; display: inline-block; }
+.transition-scale:hover { transform: scale(1.15); color: var(--verde-claro) !important; }
+
+* TÍTULOS GLOBALES *
+.section-title-main { font-weight: 800; text-transform: uppercase; border-bottom: 4px solid var(--verde-claro); padding-bottom: 5px; margin-bottom: 2rem; color: var(--verde-principal) !important; }
+.section-title { font-weight: 800; color: var(--azul-oscuro); display: inline-block; margin-bottom: 0; text-transform: uppercase; border-bottom: 4px solid var(--verde-claro); padding-bottom: 5px; }*/
