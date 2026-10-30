@@ -35,127 +35,13 @@ $historico_campeonas = [
     ["temporada" => "2021 - 2022", "campeon" => "Black Thunder RC", "subcampeon" => "Tiburones Cancún", "mvp" => "Karina Landeros"],
     ["temporada" => "2019 - 2020", "campeon" => "Pumas UNAM", "subcampeon" => "Templarios RC", "mvp" => "Cristina Uribe"]
 ];
+
+// Define el título de la página
+$page_title = "Inicio"; 
+
+include 'includes/head.php';
+include 'includes/navbar.php'; 
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liga XVs Femenil | Federación Mexicana de Rugby</title>
-    
-    <!-- Tipografía Oficial: Open Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Estilos globales homologados -->
-    <link rel="stylesheet" href="assets/css/styles.css">
-
-    <style>
-        /* Banner Hero específico para XVs Femenil */
-        .hero-banner-xvs {
-            background-color: var(--negro-nav);
-            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/img/banner/Mesa-de-trabajo-25.png'); /* Usa una foto representativa aquí */
-            background-size: cover;
-            background-position: center 30%;
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-
-        /* Títulos de sección internos */
-        .page-title {
-            font-weight: 800;
-            color: var(--verde-principal);
-            text-transform: uppercase;
-            border-bottom: 4px solid var(--verde-claro);
-            padding-bottom: 5px;
-            display: inline-block;
-            margin-bottom: 2rem;
-        }
-
-        /* Tarjetas de Equipos Participantes */
-        .team-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
-            border-bottom: 4px solid var(--rojo-institucional);
-        }
-        .team-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .team-logo-placeholder {
-            width: 80px;
-            height: 80px;
-            background-color: var(--gris-fondo);
-            border: 3px solid var(--verde-claro);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--verde-principal);
-            font-weight: 800;
-            font-size: 2rem;
-            margin: 0 auto 1rem auto;
-        }
-        .team-name {
-            font-weight: 800;
-            color: var(--azul-oscuro);
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-        .team-state {
-            font-size: 0.85rem;
-            color: #6c757d;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        /* Tabla Histórica */
-        .historical-table-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            overflow: hidden;
-            border-top: 4px solid var(--verde-principal);
-        }
-        .table-historic th {
-            background-color: var(--gris-fondo);
-            color: var(--verde-principal);
-            font-weight: 800;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-            padding: 18px 15px;
-            border-bottom: 2px solid #dee2e6;
-        }
-        .table-historic td {
-            vertical-align: middle;
-            padding: 15px;
-            color: #495057;
-            border-bottom: 1px solid #f1f3f5;
-        }
-        .table-historic tr:hover td {
-            background-color: rgba(127, 176, 105, 0.1);
-        }
-        .champ-name {
-            font-weight: 800;
-            color: var(--rojo-institucional);
-        }
-    </style>
-</head>
-<body>
-
-    <!-- NAVBAR MODULAR -->
-    <?php include 'includes/navbar.php'; ?>
 
     <!-- BANNER HERO -->
     <header class="hero-banner-xvs">

@@ -1,15 +1,13 @@
 <?php
 /**
- * FEDERACIÓN MEXICANA DE RUGBY - HOME PAGE (PROPUESTA 2 - ACTUALIZADA)
- * Decisiones del 23/Oct/2026: Calendario arriba, Sponsors, Mapa + Tabla.
+ * FEDERACIÓN MEXICANA DE RUGBY - HOME PAGE
  * Arquitectura Segura - OWASP Compliance
- * ** ACTUALIZADO CON MANUAL DE IDENTIDAD FMRU **
  */
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1); 
 ini_set('session.use_only_cookies', 1);
 session_start();
-
+ 
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 }
@@ -69,125 +67,15 @@ $sponsors = [
     "assets/img/sponsors/TierraVerde.png",
 ];
 
+// Define el título de la página
+$page_title = "Inicio"; 
+
+include 'includes/head.php';
+include 'includes/navbar.php'; 
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rugby México | Federación Mexicana de Rugby</title>
-    
-    <!-- Integración Tipografía Oficial: Open Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <!-- Integración Leaflet CSS (Propuesta para mapa interactivo seguro y gratuito) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-
-    <!-- Enlace a estilos globales -->
-    <link rel="stylesheet" href="assets/css/styles.css">
-
-    <!-- <style>
-        /* Estilos específicos de index.php */
-        .carousel-item { height: 65vh; min-height: 450px; background-color: var(--negro-nav); color: white; }
-        .section-title-mag { font-weight: 800; color: var(--rojo-institucional); text-transform: uppercase; border-bottom: 2px solid var(--verde-claro); padding-bottom: 10px; margin-bottom: 0;}
-        .btn-view-all { background-color: var(--rojo-institucional); color: white; font-weight: 600; border-radius: 2px; transition: all 0.3s ease; }
-        .btn-view-all:hover { background-color: var(--rojo-oscuro); color: white; }
-        .text-categoria { color: var(--verde-claro); font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .text-fecha { color: #6c757d; font-size: 0.8rem; }
-        .main-article { background: white; transition: 0.2s; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .main-article h3 { font-size: 1.8rem; color: var(--rojo-institucional); font-weight: 800; }
-        .small-article img { height: 160px; object-fit: cover; border-radius: 4px; }
-        .small-article h6 { font-size: 1.1rem; color: var(--rojo-institucional); font-weight: 800; line-height: 1.3; }
-        .press-list .list-group-item { background: transparent; border-color: #e9ecef; padding: 15px 0; }
-        .press-number { width: 28px; height: 28px; background-color: var(--rojo-institucional); color: white; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
-        .press-list h6 { font-size: 0.95rem; font-weight: 600; color: var(--negro-nav); line-height: 1.4; margin-top: 4px; transition: all 0.2s;}
-        .press-list h6:hover { color: var(--rojo-institucional); cursor: pointer; }
-        .events-container { background-color: #2b2b2b; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-        .events-nav-tabs .nav-link { color: #888; font-weight: 800; text-transform: uppercase; border: none; border-radius: 0; padding: 1rem; background-color: #1a1a1a; letter-spacing: 1px; transition: all 0.3s ease;}
-        .events-nav-tabs .nav-link:hover { color: var(--rojo-institucional); background-color: #222; }
-        .events-nav-tabs .nav-link.active { background-color: var(--rojo-institucional); color: white; border: none; }
-        .event-row { border-bottom: 1px solid #404040; transition: background-color 0.2s; }
-        .event-row:last-child { border-bottom: none; }
-        .event-row:hover { background-color: #333; }
-        .event-tournament { font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
-        .event-teams { font-size: 1.25rem; font-weight: 800; color: white; }
-        .event-details { font-size: 0.85rem; color: #bbb; }
-        .btn-view-all-events { background-color: var(--rojo-institucional); color: white; border-radius: 0; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; }
-        .btn-view-all-events:hover { background-color: var(--rojo-oscuro); color: white; }
-        .directorio-table th { background-color: var(--verde-principal); color: white; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; border: none; }
-        .directorio-table td { vertical-align: middle; font-size: 0.9rem; font-weight: 400;}
-        .club-logo-placeholder { width: 45px; height: 45px; background-color: var(--gris-fondo); border: 2px solid var(--verde-claro); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--verde-principal); font-weight: 800; }
-        #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; border: 2px solid var(--verde-claro); }
-        .seccion-sponsors { background-color: #212529; padding: 60px 0 20px 0; text-align: center; overflow: hidden; }
-        .titulo-sponsors { color: var(--verde-claro); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; font-weight: 800;}
-        .sponsors-principales { display: flex; justify-content: center; align-items: center; gap: 60px; margin-bottom: 40px; }
-        .sponsor-texto { color: #ffffff; font-size: 18px; font-weight: 600; }
-        .divisor-sponsors { border: none; border-top: 1px solid rgba(255,255,255,0.1); width: 80%; margin: 0 auto 40px auto; }
-        .marquee-contenedor { width: 100%; overflow: hidden; white-space: nowrap; position: relative; padding: 20px 0; }
-        .marquee-contenido { display: inline-flex; align-items: center; gap: 40px; padding-right: 40px; animation: scrollSponsors 35s linear infinite; }
-        .marquee-item { flex-shrink: 0; max-width: 140px; opacity: 0.7; filter: grayscale(100%); transition: all 0.3s ease; }
-        .marquee-item:hover { filter: grayscale(0%); opacity: 1; }
-        @keyframes scrollSponsors { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        .contenedor-boton { margin-top: 50px; }
-        .btn-quiero-sponsor { background-color: transparent; border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 12px 30px; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 6px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; }
-        .btn-quiero-sponsor:hover { background-color: rgba(255,255,255,0.1); border-color: #ffffff; color: #ffffff; }
-    </style> -->
-</head>
-<body>
-
-    <!-- BARRA SUPERIOR Y MENÚ 
-    <nav class="navbar navbar-expand-lg navbar-custom sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand bg-white p-2 rounded" href="#">
-                <img src="assets/img/logo/rugby-mexico-logo.png" alt="Logo FMRU" height="50" style="object-fit: contain;">
-            </a>
-            <button class="navbar-toggler border-white text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <i class="bi bi-list fs-1"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Federación</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="quienes-somos.php">Quiénes Somos (Misión/Visión)</a></li>
-                            <li><a class="dropdown-item" href="historia-presidencia.php">Historia + Presidencia</a></li>
-                            <li><a class="dropdown-item" href="mesa-directiva.php">Mesa Directiva + Plan</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Competencias</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">XVs Varonil</a></li>
-                            <li><a class="dropdown-item" href="#">XVs Femenil</a></li>
-                            <li><a class="dropdown-item" href="#">Game On</a></li>
-                            <li><a class="dropdown-item" href="#">Escolares / Universitarios</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Serpientes</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Femenil</a></li>
-                            <li><a class="dropdown-item" href="#">Varonil</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="#">Documentos</a></li>
-                </ul>
-                <div class="d-flex">
-                    <a href="https://sportsplus.app/public/6859/registration" target="_blank" class="btn btn-rojo rounded-pill px-4"><i class="bi bi-person-circle me-1"></i> Regístrate / Ingresar</a>
-                </div>
-            </div>
-        </div>
-    </nav>-->
-
-    <?php include 'includes/navbar.php'; ?>
 
     <!-- P1 - BANNER ROTATIVO -->
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -195,21 +83,21 @@ $sponsors = [
         </div>
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="/Lupware/FMRU/assets/img/banner/BloodFest26-1589.jpg" class="d-block w-100 object-fit-cover" alt="Banner 1" style="height: 65vh; min-height: 450px;">
+                <img src="assets/img/banner/BloodFest26-1589.jpg" class="d-block w-100 object-fit-cover" alt="Banner 1" style="height: 65vh; min-height: 450px;">
                 <div class="carousel-caption d-flex flex-column h-100 align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); top: 0; bottom: 0; left: 0; right: 0;">
                     <h1 class="display-3 text-uppercase text-white" style="font-weight: 800 !important;">La Fuerza de las Serpientes</h1>
                     <p class="lead fw-normal text-white">Apoya a nuestras selecciones en su camino internacional.</p>
                 </div>
             </div>
             <div class="carousel-item">
-                <img src="/Lupware/FMRU/assets/img/banner/Noticias_NC_FMRU.jpg" class="d-block w-100 object-fit-cover" alt="Banner 2" style="height: 65vh; min-height: 450px;">
+                <img src="assets/img/banner/Noticias_NC_FMRU.jpg" class="d-block w-100 object-fit-cover" alt="Banner 2" style="height: 65vh; min-height: 450px;">
                 <div class="carousel-caption d-flex flex-column h-100 align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); top: 0; bottom: 0; left: 0; right: 0;">
                     <h1 class="display-3 text-uppercase text-white" style="font-weight: 800 !important;">Únete a la Familia</h1>
                     <p class="lead fw-normal text-white">Encuentra un club cerca de ti y comienza a jugar.</p>
                 </div>
             </div>
             <div class="carousel-item">
-                <img src="/Lupware/FMRU/assets/img/banner/Mesa-de-trabajo-25.png" class="d-block w-100 object-fit-cover" alt="Banner 3" style="height: 65vh; min-height: 450px;">
+                <img src="assets/img/banner/Mesa-de-trabajo-25.png" class="d-block w-100 object-fit-cover" alt="Banner 3" style="height: 65vh; min-height: 450px;">
                 <div class="carousel-caption d-flex flex-column h-100 align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); top: 0; bottom: 0; left: 0; right: 0;">
                     <h1 class="display-3 text-uppercase text-white" style="font-weight: 800 !important;">Desarrollo y Competencia</h1>
                     <p class="lead fw-normal text-white">Conoce nuestros programas infantiles y juveniles.</p>
@@ -304,19 +192,19 @@ $sponsors = [
 
                 <div class="row g-4 mt-2">
                     <div class="col-md-4 small-article">
-                        <img src="assets/img/noticias/Jugada Rugby.png" class="img-fluid w-100 mb-3" alt="SVNS">
+                        <img src="assets/img/noticias/jugada_rugby.png" class="img-fluid w-100 mb-3" alt="SVNS">
                         <span class="text-categoria d-block mb-1">SVNS</span>
                         <h6>Fechas y sedes confirmados del HSBC SVNS 2 para 2027</h6>
                         <span class="text-fecha mt-2 d-block">13 octubre, 2026</span>
                     </div>
                     <div class="col-md-4 small-article">
-                        <img src="assets/img/noticias/equipo rugby.png" class="img-fluid w-100 mb-3" alt="Bienestar">
+                        <img src="assets/img/noticias/equipo_rugby.png" class="img-fluid w-100 mb-3" alt="Bienestar">
                         <span class="text-categoria d-block mb-1">Bienestar de los Jugadores</span>
                         <h6>World Rugby clarifica la Ley sobre tackles peligrosos</h6>
                         <span class="text-fecha mt-2 d-block">7 octubre, 2026</span>
                     </div>
                     <div class="col-md-4 small-article">
-                        <img src="assets/img/noticias/Balón rugby.png" class="img-fluid w-100 mb-3" alt="Gobernanza">
+                        <img src="assets/img/noticias/balon_rugby.png" class="img-fluid w-100 mb-3" alt="Gobernanza">
                         <span class="text-categoria d-block mb-1">Gobernanza</span>
                         <h6>Executive Board election process confirmed</h6>
                         <span class="text-fecha mt-2 d-block">2 octubre, 2026</span>
