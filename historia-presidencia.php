@@ -51,11 +51,25 @@ include 'includes/head.php';
 include 'includes/navbar.php'; 
 ?>
 
-    <!-- BANNER HERO -->
+    <!-- BANNER HERO 
     <header class="hero-banner-historia">
         <div class="container">
             <h1 class="display-4 fw-bold text-uppercase">Nuestra Historia</h1>
             <p class="lead">El legado del Rugby en México.</p>
+        </div>
+    </header>-->
+    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('assets/img/banner/03_historia_federacion.jpg'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.3);"></div>
+        <div class="container position-relative z-2">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="glass-panel text-white shadow-lg">
+                        <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">Rugby</span>
+                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">Nuestra Historia</h1>
+                        <p class="lead mb-0 fw-semibold opacity-75">El legado del Rugby en México.</p> 
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -109,7 +123,7 @@ include 'includes/navbar.php';
 
     <?php include 'includes/footer.php'; ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>

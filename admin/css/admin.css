@@ -1,0 +1,92 @@
+/* =========================================
+   ESTILOS GENERALES DEL PANEL (DASHBOARD)
+   ========================================= */
+body.admin-panel { 
+    font-family: 'Open Sans', sans-serif; 
+    background-color: #f4f6f9; 
+}
+
+/* --- Sidebar --- */
+.sidebar { 
+    width: 250px; /* Ancho fijo */
+    flex-shrink: 0; /* EVITA QUE SE ENCOJA */
+    min-height: 100vh; 
+    background-color: #116436; 
+    color: white; 
+    transition: all 0.3s; 
+}
+.sidebar .logo-container { background-color: white; padding: 15px; text-align: center; border-bottom: 4px solid #bf2333;}
+.sidebar .logo-container img { max-height: 60px; object-fit: contain; }
+.sidebar .nav-link { color: rgba(255,255,255,0.8); font-weight: 600; padding: 12px 20px; border-radius: 0; transition: all 0.2s; }
+.sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #004323; color: white; border-left: 4px solid #bf2333; padding-left: 16px;}
+.sidebar .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+
+/* --- Topbar --- */
+.top-navbar { background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;}
+
+/* --- Tarjetas de Dashboard --- */
+.stat-card { border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; border-top: 4px solid #7fb069;}
+.stat-card:hover { transform: translateY(-5px); }
+.stat-icon { font-size: 2.5rem; color: #116436; opacity: 0.8; }
+
+/* --- Formularios --- */
+.form-card { background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 30px; border-top: 4px solid #116436; }
+
+/* --- Tablas personalizadas --- */
+.table-custom th { background-color: #116436; color: white; font-weight: 600; }
+
+/* =========================================
+   PREVISUALIZACIONES (Banners, Sponsors, Noticias)
+   ========================================= */
+
+/* Tablas */
+.banner-preview { width: 150px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6; }
+.sponsor-preview { width: 100px; height: 60px; object-fit: contain; background-color: #fff; padding: 5px; border-radius: 4px; border: 1px solid #dee2e6; }
+.news-preview { width: 80px; height: 50px; object-fit: cover; border-radius: 4px; }
+
+/* Formularios (Clases independientes para no chocar) */
+.current-image-banner { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
+.current-image-sponsor { max-width: 200px; max-height: 150px; object-fit: contain; margin-bottom: 15px; padding: 10px; background-color: #343a40; border-radius: 8px;}
+.current-image-noticia { max-width: 300px; max-height: 200px; object-fit: cover; border-radius: 8px; }
+
+/* =========================================
+   LOGIN (index.php)
+   ========================================= */
+body.login-page {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f8f9fa;
+    background-image: linear-gradient(rgba(0, 67, 35, 0.9), rgba(0, 67, 35, 0.9)), url('../../assets/img/banner/Mesa-de-trabajo-25.png');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-card { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; width: 100%; max-width: 450px; border-top: 5px solid #bf2333; }
+.login-header { background-color: #ffffff; padding: 30px 20px 10px; text-align: center; }
+.login-header img { max-height: 80px; margin-bottom: 15px; }
+.btn-fmru { background-color: #116436; color: white; font-weight: 600; padding: 12px; transition: all 0.3s; }
+.btn-fmru:hover { background-color: #004323; color: white; }
+
+/* --- Gestor de Contenidos --- */
+.nav-tabs-custom .nav-link {
+    color: #495057;
+    font-weight: 600;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+}
+.nav-tabs-custom .nav-link:hover {
+    color: #116436;
+    background-color: #f8f9fa;
+}
+.nav-tabs-custom .nav-link.active {
+    color: #bf2333;
+    background-color: transparent;
+    border-bottom: 3px solid #bf2333;
+}
+.badge-blog { background-color: #116436; color: white; }
+.badge-prensa { background-color: #343a40; color: white; }
+.badge-landing { background-color: #0dcaf0; color: #000; }

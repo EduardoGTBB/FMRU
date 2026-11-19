@@ -224,3 +224,396 @@ body {
 .doc-category { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: var(--verde-claro); letter-spacing: 0.5px; }
 .btn-descargar { background-color: white; color: var(--rojo-institucional); border: 2px solid var(--rojo-institucional); font-weight: 600; padding: 6px 15px; border-radius: 4px; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
 .btn-descargar:hover { background-color: var(--rojo-institucional); color: white; }
+
+/* =========================================
+   SPONSORS Y CARRUSELES
+   ========================================= */
+.seccion-sponsors { 
+    background-color: #ffffff; 
+    padding: 60px 0; 
+    overflow: hidden; 
+}
+
+.titulo-sponsors { 
+    color: var(--azul-oscuro); 
+    font-size: 1.5rem; 
+    letter-spacing: 2px; 
+    text-transform: uppercase; 
+    margin-bottom: 40px; 
+    font-weight: 800;
+}
+
+.marquee-contenedor { 
+    width: 100%; 
+    overflow: hidden; 
+    white-space: nowrap; 
+    position: relative; 
+    padding: 10px 0; 
+}
+
+/* Fila 1: Animación a la IZQUIERDA */
+.marquee-contenido { 
+    display: inline-flex; 
+    align-items: center; 
+    width: max-content; 
+    animation: scroll-left 35s linear infinite; 
+}
+
+/* Fila 2: Animación a la DERECHA */
+.marquee-contenido-reverse { 
+    display: inline-flex; 
+    align-items: center; 
+    width: max-content; 
+    animation: scroll-right 35s linear infinite; 
+}
+
+.marquee-item { 
+    flex-shrink: 0; 
+    max-width: 150px; 
+    opacity: 0.7; 
+    filter: grayscale(100%); 
+    transition: all 0.3s ease; 
+    margin: 0 40px; /* Esto da el espacio perfecto y uniforme entre logos */
+}
+
+.marquee-item:hover { filter: grayscale(0%); opacity: 1; }
+
+.marquee-contenido:hover, 
+.marquee-contenido-reverse:hover { 
+    animation-play-state: paused; 
+}
+
+@keyframes scroll-left { 
+    0% { transform: translateX(0); } 
+    100% { transform: translateX(-50%); } 
+}
+
+@keyframes scroll-right { 
+    0% { transform: translateX(-50%); } 
+    100% { transform: translateX(0); } 
+}
+
+.btn-quiero-sponsor { 
+    background-color: transparent; 
+    border: 2px solid var(--rojo-institucional); 
+    color: var(--rojo-institucional); 
+    padding: 12px 30px; 
+    text-decoration: none; 
+    font-size: 14px; 
+    font-weight: 800; 
+    border-radius: 6px; 
+    transition: all 0.3s ease; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 10px; 
+}
+
+.btn-quiero-sponsor:hover { 
+    background-color: var(--rojo-institucional); 
+    color: #ffffff; 
+}
+
+/* =========================================
+   LANDING PAGES (PLANTILLA TORNEO)
+   ========================================= */
+.landing-hero { 
+    min-height: 50vh; 
+    display: flex; 
+    align-items: center; 
+    background-size: cover; 
+    background-position: center; 
+    position: relative; 
+    text-align: center;
+}
+.articulo-overlay { 
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+    background: linear-gradient(to bottom, rgba(17,17,17,0.5) 0%, rgba(17,17,17,0.9) 100%); 
+}
+.price-card { 
+    background: white; 
+    border: 2px solid #e9ecef; 
+    border-radius: 15px; 
+    transition: all 0.3s ease; 
+    position: relative; 
+    overflow: hidden;
+}
+.price-card:hover { 
+    border-color: var(--verde-principal); 
+    transform: translateY(-10px); 
+    box-shadow: 0 15px 30px rgba(17,100,54,0.15) !important; 
+}
+.price-card.fase-activa { 
+    border-color: var(--rojo-institucional); 
+}
+.price-badge { 
+    color: white; 
+    padding: 8px 25px; 
+    font-weight: 800; 
+    font-size: 0.85rem; 
+    border-radius: 0 0 15px 15px; 
+    display: inline-block; 
+    letter-spacing: 1px;
+}
+.price-amount { 
+    font-size: 2.5rem; 
+    font-weight: 800; 
+    color: var(--azul-oscuro); 
+    margin: 25px 0; 
+}
+
+/* =========================================
+   PAGINACIÓN (Noticias)
+   ========================================= */
+.custom-pagination .page-link {
+    color: var(--verde-principal);
+    font-weight: 600;
+    border-color: #dee2e6;
+    padding: 10px 18px;
+    margin: 0 3px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+.custom-pagination .page-link:hover {
+    color: #ffffff;
+    background-color: var(--verde-claro);
+    border-color: var(--verde-claro);
+}
+.custom-pagination .page-item.active .page-link {
+    background-color: var(--rojo-institucional);
+    border-color: var(--rojo-institucional);
+    color: white;
+}
+.custom-pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+/* =========================================
+   LANDING PAGES - DISEÑO TORNEO (ESTILO CANCÚN)
+   ========================================= */
+.torneo-bg-arena {
+    background-color: #fdf6e3; 
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+    position: relative;
+    z-index: 1;
+}
+
+.torneo-historia-texto {
+    font-size: 1.15rem;
+    line-height: 1.9;
+    color: #4a4a4a;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Tarjetas de Precios Dinámicas */
+.price-card-torneo { 
+    background: #ffffff; 
+    border: 3px solid #e2e8f0; 
+    border-radius: 20px; 
+    transition: all 0.3s ease; 
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.price-card-torneo.fase-activa { 
+    border-color: #60a5fa; /* Un azul suave playero/destacado */
+    transform: scale(1.05);
+    box-shadow: 0 20px 40px rgba(96, 165, 250, 0.2) !important; 
+    z-index: 2;
+}
+
+.price-card-torneo:not(.fase-activa):hover {
+    transform: translateY(-5px);
+    border-color: #cbd5e1;
+}
+
+.price-badge-torneo { 
+    background: linear-gradient(135deg, #1e293b, #334155); 
+    color: white; 
+    padding: 12px 15px; 
+    font-weight: 800; 
+    font-size: 1rem; 
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-radius: 0 0 20px 20px;
+    margin: 0 20px;
+}
+
+.price-card-torneo.fase-activa .price-badge-torneo {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.price-amount-torneo { 
+    font-size: 2.8rem; 
+    font-weight: 900; 
+    color: #0f172a; 
+    margin: 25px 0; 
+}
+
+/* =========================================
+   COMPETENCIAS: GAME ON Y ESCOLARES
+   ========================================= */
+.hero-banner-gameon { 
+    background-color: var(--verde-oscuro); 
+    background-image: linear-gradient(rgba(0, 67, 35, 0.8), rgba(0, 67, 35, 0.9)), url('../img/banner/Mesa-de-trabajo-25.png'); 
+    background-size: cover; 
+    background-position: center; 
+    color: white; 
+    padding: 90px 0; 
+    text-align: center; 
+}
+
+.hero-banner-escolar { 
+    background-color: var(--rojo-oscuro); 
+    background-image: linear-gradient(rgba(121, 33, 40, 0.85), rgba(17, 17, 17, 0.9)), url('../img/banner/Mesa-de-trabajo-25.png'); 
+    background-size: cover; 
+    background-position: center; 
+    color: white; 
+    padding: 90px 0; 
+    text-align: center; 
+}
+
+.variant-card { 
+    background: white; 
+    border-radius: 12px; 
+    padding: 2.5rem 1.5rem; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    height: 100%; 
+    border-top: 5px solid var(--verde-claro); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
+    text-align: center;
+}
+
+.variant-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1); 
+}
+
+.variant-icon { 
+    font-size: 3.5rem; 
+    color: var(--rojo-institucional); 
+    margin-bottom: 1rem; 
+    transition: transform 0.3s ease;
+}
+
+.variant-card:hover .variant-icon {
+    transform: scale(1.1);
+}
+/* =========================================
+   NUEVO DISEÑO ÉLITE: COMPETENCIAS Y SERPIENTES
+   ========================================= */
+
+/* Glassmorphism (Efecto Cristal) para Heros */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+}
+.glass-panel-dark {
+    background: rgba(17, 17, 17, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}
+
+/* Tarjetas de Clubes (Femenil) */
+.club-card-modern {
+    background: #ffffff;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+.club-card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--verde-principal), var(--verde-claro));
+    z-index: 2;
+}
+.club-card-modern:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(17, 100, 54, 0.15);
+}
+
+/* Tarjetas Roster Pro (Serpientes) */
+.pro-player-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s ease;
+    border: 1px solid #333;
+    /* 1. ALTURA FIJA GARANTIZADA: Evita el colapso aunque no haya foto */
+    min-height: 320px; 
+    display: flex;
+    align-items: flex-end; /* Empuja el contenedor de texto hacia abajo */
+}
+.pro-player-card:hover {
+    border-color: var(--rojo-institucional);
+    transform: scale(1.03);
+    box-shadow: 0 15px 30px rgba(191, 35, 51, 0.2);
+}
+.pro-player-img {
+    position: absolute; /* 2. IMAGEN DESVINCULADA DEL FLUJO */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100% !important; /* Ignora cualquier clase de Bootstrap */
+    object-fit: cover;
+    filter: grayscale(80%) contrast(120%);
+    transition: filter 0.4s ease;
+    z-index: 1;
+}
+.pro-player-card:hover .pro-player-img {
+    filter: grayscale(0%) contrast(100%);
+}
+.pro-player-info {
+    position: relative; /* 3. TEXTO EN EL FLUJO NORMAL */
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,1) 15%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0));
+    padding: 80px 20px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2; /* Siempre por encima de la imagen */
+}
+
+/* Listas de Honor (Leaderboards) */
+.honor-row {
+    background: #ffffff;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+}
+.honor-row:hover {
+    border-left-color: var(--rojo-institucional);
+    background: #f8f9fa;
+    transform: translateX(5px);
+}
+.honor-row-dark {
+    background: #222;
+    color: white;
+    border-color: #333;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.honor-row-dark:hover {
+    background: #2a2a2a;
+    border-left-color: var(--verde-principal);
+}

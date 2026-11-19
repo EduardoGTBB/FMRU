@@ -1,21 +1,16 @@
 <?php
 /**
  * FEDERACIÓN MEXICANA DE RUGBY - LIGA XVS FEMENIL
- * Arquitectura Segura - OWASP Compliance
- * BASADO EN MANUAL DE IDENTIDAD FMRU 2026
+ * Diseño Moderno - OWASP Compliance
  */
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1); 
 ini_set('session.use_only_cookies', 1);
 session_start();
 
-function e($string) {
-    return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-}
+require_once __DIR__ . '/admin/config/db.php';
 
-// --- DATOS SIMULADOS PARA LA LIGA XVS FEMENIL ---
-
-// 1. Equipos Participantes (Puedes sustituirlos por los reales)
+// 1. Equipos Participantes
 $equipos_xvs = [
     ["nombre" => "Pumas UNAM", "estado" => "Ciudad de México", "logo" => "P"],
     ["nombre" => "Lobos Occidente", "estado" => "Jalisco", "logo" => "L"],
@@ -27,109 +22,104 @@ $equipos_xvs = [
     ["nombre" => "Templarios RC", "estado" => "Ciudad de México", "logo" => "T"]
 ];
 
-// 2. Histórico de Campeonatos (Adaptado de la tabla histórica)
+// 2. Histórico de Campeonatos (Salón de la Fama)
 $historico_campeonas = [
     ["temporada" => "2024 - 2025", "campeon" => "Pumas UNAM", "subcampeon" => "Black Thunder RC", "mvp" => "Isabela González"],
     ["temporada" => "2023 - 2024", "campeon" => "Lobos Occidente", "subcampeon" => "Legión Cuervos", "mvp" => "Tamara Raya Cano"],
     ["temporada" => "2022 - 2023", "campeon" => "Pumas UNAM", "subcampeon" => "Abejas Guanajuato", "mvp" => "Verónica Estrada"],
-    ["temporada" => "2021 - 2022", "campeon" => "Black Thunder RC", "subcampeon" => "Tiburones Cancún", "mvp" => "Karina Landeros"],
-    ["temporada" => "2019 - 2020", "campeon" => "Pumas UNAM", "subcampeon" => "Templarios RC", "mvp" => "Cristina Uribe"]
+    ["temporada" => "2021 - 2022", "campeon" => "Black Thunder RC", "subcampeon" => "Tiburones Cancún", "mvp" => "Karina Landeros"]
 ];
 
-// Define el título de la página
-$page_title = "Inicio"; 
-
+$page_title = "Liga XVs Femenil"; 
 include 'includes/head.php';
 include 'includes/navbar.php'; 
 ?>
 
-    <!-- BANNER HERO -->
-    <header class="hero-banner-xvs">
-        <div class="container">
-            <h1 class="display-4 fw-bold text-uppercase">Liga de Rugby XVs Femenil</h1>
-            <p class="lead mb-0">La máxima categoría del rugby union femenil en México.</p>
+    <!-- HERO EFECTO CRISTAL CON FALLBACK SEGURO -->
+    <!-- FIX: Añadimos un backgroundColor corporativo de respaldo por si la imagen falla -->
+    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('assets/img/banner/BloodFest26-1589.jpg'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.3);"></div>
+        <div class="container position-relative z-2">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="glass-panel text-white shadow-lg">
+                        <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">Primera Fuerza</span>
+                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">Liga XVs Femenil</h1>
+                        <p class="lead mb-0 fw-semibold opacity-75">La élite del rugby union femenino en México.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="container my-5">
+    <main class="container my-5 pb-5">
         
-        <!-- SECCIÓN: INTRODUCCIÓN -->
-        <section class="row mb-5 text-center">
-            <div class="col-lg-8 mx-auto">
-                <p class="lead text-muted">
-                    El Campeonato Nacional de Rugby XVs Femenil es la competición de mayor nivel y exigencia física en nuestro país. Reúne a los mejores clubes de diversas regiones para disputar el título nacional, fomentando el desarrollo continuo del rugby femenino, el trabajo en equipo y la formación de futuras seleccionadas nacionales.
+        <!-- INTRODUCCIÓN -->
+        <section class="row mb-5 justify-content-center text-center">
+            <div class="col-lg-8">
+                <p class="lead text-muted" style="line-height: 1.8;">
+                    Reuniendo a los clubes más fuertes del país en un formato de alta exigencia física y táctica. El semillero oficial de las futuras seleccionadas nacionales.
                 </p>
             </div>
         </section>
 
-        <!-- SECCIÓN: EQUIPOS PARTICIPANTES -->
-        <section class="mb-5 pb-4 border-bottom">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h2 class="page-title">Equipos Participantes (Temporada Actual)</h2>
-                </div>
-            </div>
+        <!-- CLUBES: GRID MODERNO -->
+        <section class="mb-5 pb-5 border-bottom border-secondary border-opacity-25">
+            <h3 class="fw-bold text-uppercase mb-5 text-center" style="color: var(--verde-principal); letter-spacing: 1px;">Clubes Participantes</h3>
             
-            <div class="row g-4">
+            <div class="row g-4 justify-content-center">
                 <?php foreach($equipos_xvs as $equipo): ?>
-                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                    <div class="team-card">
-                        <div class="team-logo-placeholder">
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="club-card-modern p-4 text-center h-100">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3 border" style="width: 80px; height: 80px; font-size: 2rem; color: var(--verde-principal); font-weight: 900;">
                             <?= e($equipo['logo']) ?>
                         </div>
-                        <h4 class="team-name"><?= e($equipo['nombre']) ?></h4>
-                        <div class="team-state"><i class="bi bi-geo-alt-fill text-danger me-1"></i><?= e($equipo['estado']) ?></div>
+                        <h5 class="fw-bold text-dark mb-1"><?= e($equipo['nombre']) ?></h5>
+                        <span class="badge bg-light text-secondary border px-3 py-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i> <?= e($equipo['estado']) ?></span>
                     </div>
                 </div>
                 <?php endforeach; ?>
             </div>
         </section>
 
-        <!-- SECCIÓN: HISTÓRICO DE CAMPEONATOS -->
+        <!-- SALÓN DE LA FAMA (Timeline/Leaderboard) -->
         <section class="mb-5">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h2 class="page-title">Histórico de Campeonas</h2>
-                    <p class="text-muted">Registro de los clubes que han conquistado el título nacional a lo largo de los años.</p>
-                </div>
+            <div class="text-center mb-5">
+                <h3 class="fw-bold text-uppercase" style="color: var(--rojo-institucional); letter-spacing: 1px;">Salón de la Fama</h3>
+                <p class="text-muted">Las campeonas que han forjado nuestra historia.</p>
             </div>
 
-            <div class="row">
-                <div class="col-12">
-                    <div class="historical-table-container table-responsive">
-                        <table class="table table-borderless table-historic mb-0">
-                            <thead>
-                                <tr>
-                                    <th scope="col" style="width: 60px;" class="text-center"><i class="bi bi-trophy-fill text-warning fs-5"></i></th>
-                                    <th scope="col">Temporada</th>
-                                    <th scope="col">Campeón (1er Lugar)</th>
-                                    <th scope="col">Subcampeón (2do Lugar)</th>
-                                    <th scope="col">Jugadora Destacada (MVP)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach($historico_campeonas as $index => $historia): ?>
-                                <tr>
-                                    <td class="text-center fw-bold text-muted"><?= $index + 1 ?></td>
-                                    <td class="fw-semibold text-dark"><?= e($historia['temporada']) ?></td>
-                                    <td><span class="champ-name"><i class="bi bi-star-fill text-warning me-1 small"></i> <?= e($historia['campeon']) ?></span></td>
-                                    <td><?= e($historia['subcampeon']) ?></td>
-                                    <td class="fst-italic text-secondary"><?= e($historia['mvp']) ?></td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <?php foreach($historico_campeonas as $index => $historia): ?>
+                    <div class="honor-row">
+                        <div class="d-flex align-items-center gap-4 w-100">
+                            <!-- Trofeo / Año -->
+                            <div class="text-center border-end pe-4" style="min-width: 120px;">
+                                <i class="bi bi-trophy-fill fs-4 <?= $index === 0 ? 'text-warning' : 'text-secondary opacity-50' ?>"></i>
+                                <div class="fw-bold text-dark mt-1"><?= e($historia['temporada']) ?></div>
+                            </div>
+                            
+                            <!-- Campeón y Subcampeón -->
+                            <div class="flex-grow-1">
+                                <h4 class="fw-bold mb-1" style="color: var(--verde-principal);"><?= e($historia['campeon']) ?> <i class="bi bi-patch-check-fill ms-1 text-primary fs-6"></i></h4>
+                                <div class="text-muted small">Subcampeón: <strong><?= e($historia['subcampeon']) ?></strong></div>
+                            </div>
+                            
+                            <!-- MVP -->
+                            <div class="text-end d-none d-md-block">
+                                <div class="text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">MVP Final</div>
+                                <div class="fw-semibold text-dark"><i class="bi bi-star-fill text-warning me-1"></i> <?= e($historia['mvp']) ?></div>
+                            </div>
+                        </div>
                     </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER MODULAR -->
     <?php include 'includes/footer.php'; ?>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

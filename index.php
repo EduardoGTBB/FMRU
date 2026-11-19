@@ -7,15 +7,100 @@ ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1); 
 ini_set('session.use_only_cookies', 1);
 session_start();
+
+require_once __DIR__ . '/admin/config/db.php';
+
+try {
+    // $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $db_user, $db_pass);
+    // $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
+    // --- OBTENER NOTICIAS (Separadas por tipo) ---
+    // 1. Noticia Principal (La más reciente)
+    /*$stmtPrincipal = $pdo->query("SELECT * FROM fmru_noticias WHERE activo = 1 AND tipo = 'principal' ORDER BY fecha_publicacion DESC, id DESC LIMIT 1");
+    $noticia_principal = $stmtPrincipal->fetch(PDO::FETCH_ASSOC);
+
+    // 2. Noticias Secundarias (Las 3 más recientes)
+    $stmtSecundarias = $pdo->query("SELECT * FROM fmru_noticias WHERE activo = 1 AND tipo = 'secundaria' ORDER BY fecha_publicacion DESC, id DESC LIMIT 3");
+    $noticias_secundarias = $stmtSecundarias->fetchAll(PDO::FETCH_ASSOC);*/
+    // --- OBTENER LAS 4 NOTICIAS MÁS RECIENTES ---
+    // La consulta las trae ordenadas por fecha. Luego PHP las separará.
+    $stmtNoticias = $pdo->query("SELECT * FROM fmru_noticias WHERE activo = 1 AND tipo != 'comunicado' ORDER BY fecha_publicacion DESC, id DESC LIMIT 4");
+    $todas_noticias = $stmtNoticias->fetchAll(PDO::FETCH_ASSOC);
+
+    // Separamos: La posición [0] es la más nueva (Principal), las otras 3 son secundarias
+    $noticia_principal = !empty($todas_noticias) ? array_shift($todas_noticias) : null;
+    $noticias_secundarias = $todas_noticias;
+
+    // 3. Comunicados de Prensa (Los 4 más recientes)
+    $stmtComunicados = $pdo->query("SELECT * FROM fmru_noticias WHERE activo = 1 AND tipo = 'comunicado' ORDER BY fecha_publicacion DESC, id DESC LIMIT 4");
+    $comunicados = $stmtComunicados->fetchAll(PDO::FETCH_ASSOC);
+
+    // Obtener Banners Activos
+    $stmtBanners = $pdo->query("SELECT * FROM fmru_banners WHERE activo = 1 ORDER BY orden ASC");
+    $banners_activos = $stmtBanners->fetchAll(PDO::FETCH_ASSOC);
+
+    // Obtener Sponsors Activos
+    $stmtSponsors = $pdo->query("SELECT * FROM fmru_sponsors WHERE activo = 1 ORDER BY orden ASC");
+    $todos_sponsors = $stmtSponsors->fetchAll(PDO::FETCH_ASSOC);
+    
+    $sponsors_principales = [];
+    $sponsors_tecnicos = [];
+    $sponsors_proveedores = [];
+    
+    foreach ($todos_sponsors as $sp) {
+        if ($sp['nivel'] === 'Patrocinador Principal') {
+            $sponsors_principales[] = $sp;
+        } elseif ($sp['nivel'] === 'Socio Técnico') {
+            $sponsors_tecnicos[] = $sp;
+        } else {
+            $sponsors_proveedores[] = $sp;
+        }
+    }
+
+} catch (PDOException $e) {
+    die("Error de conexión"); // En producción, registra el error y muestra un mensaje amigable
+}
  
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 }
 
+// Funciones Auxiliares para Fechas en Español
+function fechaEsp($fecha) {
+    $meses = ['01'=>'enero', '02'=>'febrero', '03'=>'marzo', '04'=>'abril', '05'=>'mayo', '06'=>'junio', '07'=>'julio', '08'=>'agosto', '09'=>'septiembre', '10'=>'octubre', '11'=>'noviembre', '12'=>'diciembre'];
+    $timestamp = strtotime($fecha);
+    return ltrim(date('d', $timestamp), '0') . " " . $meses[date('m', $timestamp)] . ", " . date('Y', $timestamp);
+}
+
+function fechaEspCorta($fecha) {
+    $meses = ['01'=>'oct', '02'=>'feb', '03'=>'mar', '04'=>'abr', '05'=>'may', '06'=>'jun', '07'=>'jul', '08'=>'ago', '09'=>'sep', '10'=>'oct', '11'=>'nov', '12'=>'dic'];
+    $timestamp = strtotime($fecha);
+    return ltrim(date('d', $timestamp), '0') . " " . $meses[date('m', $timestamp)] . ", " . date('y', $timestamp);
+}
+
 // Datos Simulados
 $proximos_eventos = [
-    ["torneo" => "Torneo Nacional Mayor - Jornada 3", "equipo_local" => "Black Thunder RC", "equipo_visitante" => "Pumas UNAM", "fecha" => "24 Octubre, 2026", "hora" => "11:30 hrs", "sede" => "Deportivo Xochimilco"],
-    ["torneo" => "Liga de Occidente Femenil - Semifinal", "equipo_local" => "Lobos Occidente", "equipo_visitante" => "Rhinos RC", "fecha" => "24 Octubre, 2026", "hora" => "14:00 hrs", "sede" => "Parque Metropolitano, GDL"],
+    [
+        "torneo" => "Torneo Nacional Mayor - Jornada 3", 
+        "equipo_local" => "Black Thunder RC", 
+        "escudo_local" => "assets/img/clubes/black_thunder.png",
+        "equipo_visitante" => "Pumas UNAM", 
+        "escudo_visitante" => "assets/img/clubes/pumas.png",
+        "fecha" => "24 Octubre, 2026", 
+        "hora" => "11:30 hrs", 
+        "sede" => "Deportivo Xochimilco"
+    ],
+    [
+        "torneo" => "Liga de Occidente Femenil - Semifinal", 
+        "equipo_local" => "Lobos Occidente", 
+        "escudo_local" => "assets/img/clubes/lobos.png",
+        "equipo_visitante" => "Rhinos RC", 
+        "escudo_visitante" => "assets/img/clubes/rhinos.png",
+        "fecha" => "24 Octubre, 2026", 
+        "hora" => "14:00 hrs", 
+        "sede" => "Parque Metropolitano, GDL"
+    ]
 ];
 
 // Directorio Completo de Clubes (Basado en el listado de FMRU)
@@ -74,36 +159,31 @@ include 'includes/head.php';
 include 'includes/navbar.php'; 
 ?>
 
-    <!-- P1 - BANNER ROTATIVO -->
+    <!-- P1 - BANNER ROTATIVO (DINÁMICO) -->
     <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        
+        <!-- Indicadores Dinámicos -->
         <div class="carousel-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <?php foreach ($banners_activos as $index => $banner): ?>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="<?= $index ?>" class="<?= $index === 0 ? 'active' : '' ?>" aria-label="Slide <?= $index + 1 ?>"></button>
+            <?php endforeach; ?>
         </div>
+        
+        <!-- Imágenes Dinámicas -->
         <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="assets/img/banner/BloodFest26-1589.jpg" class="d-block w-100 object-fit-cover" alt="Banner 1" style="height: 65vh; min-height: 450px;">
-                <div class="carousel-caption d-flex flex-column h-100 align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); top: 0; bottom: 0; left: 0; right: 0;">
-                    <h1 class="display-3 text-uppercase text-white" style="font-weight: 800 !important;">La Fuerza de las Serpientes</h1>
-                    <p class="lead fw-normal text-white">Apoya a nuestras selecciones en su camino internacional.</p>
+            <?php foreach ($banners_activos as $index => $banner): ?>
+                <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>" data-bs-interval="4000">
+                    <img src="<?= e($banner['imagen_url']) ?>" class="d-block w-100 object-fit-cover" alt="<?= e($banner['titulo']) ?>" style="height: 65vh; min-height: 450px;">
+                    <div class="carousel-caption d-flex flex-column h-100 align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); top: 0; bottom: 0; left: 0; right: 0;">
+                        <h1 class="display-3 text-uppercase text-white" style="font-weight: 800 !important;"><?= e($banner['titulo']) ?></h1>
+                        <?php if (!empty($banner['subtitulo'])): ?>
+                            <p class="lead fw-normal text-white"><?= e($banner['subtitulo']) ?></p>
+                        <?php endif; ?>
+                    </div>
                 </div>
-            </div>
-            <div class="carousel-item">
-                <img src="assets/img/banner/Noticias_NC_FMRU.jpg" class="d-block w-100 object-fit-cover" alt="Banner 2" style="height: 65vh; min-height: 450px;">
-                <div class="carousel-caption d-flex flex-column h-100 align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); top: 0; bottom: 0; left: 0; right: 0;">
-                    <h1 class="display-3 text-uppercase text-white" style="font-weight: 800 !important;">Únete a la Familia</h1>
-                    <p class="lead fw-normal text-white">Encuentra un club cerca de ti y comienza a jugar.</p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img src="assets/img/banner/Mesa-de-trabajo-25.png" class="d-block w-100 object-fit-cover" alt="Banner 3" style="height: 65vh; min-height: 450px;">
-                <div class="carousel-caption d-flex flex-column h-100 align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); top: 0; bottom: 0; left: 0; right: 0;">
-                    <h1 class="display-3 text-uppercase text-white" style="font-weight: 800 !important;">Desarrollo y Competencia</h1>
-                    <p class="lead fw-normal text-white">Conoce nuestros programas infantiles y juveniles.</p>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
+        
         <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Anterior</span>
@@ -134,25 +214,44 @@ include 'includes/navbar.php';
                     </ul>
                     
                     <div class="tab-content" id="eventTabContent">
+                        <!-- Tab: Programación -->
                         <div class="tab-pane fade show active" id="programacion" role="tabpanel">
                             <?php foreach($proximos_eventos as $evento): ?>
                             <div class="event-row p-4 text-center">
-                                <div class="event-tournament mb-2"><?= e($evento['torneo']) ?></div>
-                                <div class="event-teams mb-2">
-                                    <span><?= e($evento['equipo_local']) ?></span>
-                                    <span class="mx-3 text-muted">—</span>
-                                    <span><?= e($evento['equipo_visitante']) ?></span>
+                                <!-- Corrección: Eliminado text-muted, agregado text-white-50 -->
+                                <div class="event-tournament mb-3 text-white-50 small fw-bold text-uppercase"><?= e($evento['torneo']) ?></div>
+                                
+                                <!-- Contenedor de Equipos y Escudos -->
+                                <div class="d-flex justify-content-center align-items-center mb-3">
+                                    <!-- Local -->
+                                    <div class="text-end d-flex align-items-center justify-content-end" style="width: 45%;">
+                                        <h5 class="text-white fw-bold mb-0 me-3 d-none d-md-block"><?= e($evento['equipo_local']) ?></h5>
+                                        <img src="<?= e($evento['escudo_local']) ?>" alt="Local" class="equipo-escudo" onerror="this.outerHTML='<div class=\'equipo-escudo-fallback\'><?= substr(e($evento['equipo_local']),0,1) ?></div>'">
+                                    </div>
+                                    
+                                    <!-- VS -->
+                                    <!-- Corrección: Eliminado text-secondary, agregado text-white-50 -->
+                                    <div class="px-3 text-white-50 fw-bold small">VS</div>
+                                    
+                                    <!-- Visitante -->
+                                    <div class="text-start d-flex align-items-center justify-content-start" style="width: 45%;">
+                                        <img src="<?= e($evento['escudo_visitante']) ?>" alt="Visitante" class="equipo-escudo" onerror="this.outerHTML='<div class=\'equipo-escudo-fallback\'><?= substr(e($evento['equipo_visitante']),0,1) ?></div>'">
+                                        <h5 class="text-white fw-bold mb-0 ms-3 d-none d-md-block"><?= e($evento['equipo_visitante']) ?></h5>
+                                    </div>
                                 </div>
-                                <div class="event-details">
-                                    <span><?= e($evento['fecha']) ?> <?= e($evento['hora']) ?></span>
-                                    <span class="mx-2 text-muted">|</span>
-                                    <span><i class="bi bi-geo-alt-fill text-secondary"></i> <?= e($evento['sede']) ?></span>
+
+                                <!-- Corrección: Eliminado text-muted, agregado text-white-50 -->
+                                <div class="event-details text-white-50 small">
+                                    <span><i class="bi bi-clock me-1"></i> <?= e($evento['fecha']) ?> <?= e($evento['hora']) ?></span>
+                                    <span class="mx-2 opacity-50">|</span>
+                                    <span><i class="bi bi-geo-alt-fill me-1 text-danger"></i> <?= e($evento['sede']) ?></span>
                                 </div>
                             </div>
                             <?php endforeach; ?>
                             
-                            <a href="https://sportsplus.app/public/6859/calendar" target="_blank" class="btn btn-view-all-events d-block py-3 w-100 text-decoration-none">
-                                Ver Calendario Completo en SportPlus <i class="bi bi-box-arrow-up-right float-end mt-1"></i>
+                            <!-- Botón redirigiendo a la página completa de jornadas -->
+                            <a href="jornadas.php" class="btn btn-view-all-events d-block py-3 w-100 text-decoration-none">
+                                VER TODAS LAS JORNADAS <i class="bi bi-arrow-right-circle ms-2 mt-1"></i>
                             </a>
                         </div>
                         
@@ -167,7 +266,7 @@ include 'includes/navbar.php';
         </div>
     </section>
 
-    <!-- P3 - NOTICIAS -->
+    <!-- P3 - NOTICIAS 
     <section class="container my-5">
         <div class="row g-5">
             <div class="col-lg-8">
@@ -176,66 +275,151 @@ include 'includes/navbar.php';
                     <a href="#" class="btn btn-view-all btn-sm px-4 py-2 text-decoration-none">Ver Todo</a>
                 </div>
 
+                !-- NOTICIA PRINCIPAL --
+                <php if ($noticia_principal): ?>
                 <div class="card main-article mb-4">
                     <div class="row g-0 flex-column-reverse flex-md-row">
                         <div class="col-md-5 p-4 d-flex flex-column justify-content-center">
-                            <span class="text-categoria mb-2">RWC 2027</span>
-                            <h3 class="mb-3">Nuevo Colaborador Oficial de la Copa Mundial</h3>
-                            <p class="text-muted small mb-4">World Rugby ha anunciado hoy el principal grupo minorista que será el Supermercado Oficial Colaborador de la Rugby World Cup...</p>
-                            <span class="text-fecha mt-auto">19 octubre, 2026 · Lectura: 3'</span>
+                            <span class="text-categoria mb-2"><= e($noticia_principal['categoria']) ?></span>
+                            <h3 class="mb-3"><= e($noticia_principal['titulo']) ?></h3>
+                            <p class="text-muted small mb-4"><= e($noticia_principal['extracto']) ?></p>
+                            <span class="text-fecha mt-auto">
+                                <= fechaEsp($noticia_principal['fecha_publicacion']) ?> 
+                                <= !empty($noticia_principal['tiempo_lectura']) ? " · Lectura: " . e($noticia_principal['tiempo_lectura']) : "" ?>
+                            </span>
                         </div>
                         <div class="col-md-7">
-                            <img src="assets/img/noticias/rugby.png" class="img-fluid h-100 object-fit-cover" alt="Noticia Principal">
+                            <img src="<= e($noticia_principal['imagen_url']) ?>" class="img-fluid h-100 object-fit-cover w-100" alt="<= e($noticia_principal['titulo']) ?>" style="min-height: 250px;">
                         </div>
                     </div>
                 </div>
+                <php endif; ?>
 
+                !-- NOTICIAS SECUNDARIAS --
+                <php if (!empty($noticias_secundarias)): ?>
                 <div class="row g-4 mt-2">
+                    <php foreach ($noticias_secundarias as $secundaria): ?>
                     <div class="col-md-4 small-article">
-                        <img src="assets/img/noticias/jugada_rugby.png" class="img-fluid w-100 mb-3" alt="SVNS">
-                        <span class="text-categoria d-block mb-1">SVNS</span>
-                        <h6>Fechas y sedes confirmados del HSBC SVNS 2 para 2027</h6>
-                        <span class="text-fecha mt-2 d-block">13 octubre, 2026</span>
+                        <img src="<= e($secundaria['imagen_url']) ?>" class="img-fluid w-100 mb-3" alt="<= e($secundaria['titulo']) ?>">
+                        <span class="text-categoria d-block mb-1"><= e($secundaria['categoria']) ?></span>
+                        <h6><= e($secundaria['titulo']) ?></h6>
+                        <span class="text-fecha mt-2 d-block"><= fechaEsp($secundaria['fecha_publicacion']) ?></span>
                     </div>
-                    <div class="col-md-4 small-article">
-                        <img src="assets/img/noticias/equipo_rugby.png" class="img-fluid w-100 mb-3" alt="Bienestar">
-                        <span class="text-categoria d-block mb-1">Bienestar de los Jugadores</span>
-                        <h6>World Rugby clarifica la Ley sobre tackles peligrosos</h6>
-                        <span class="text-fecha mt-2 d-block">7 octubre, 2026</span>
-                    </div>
-                    <div class="col-md-4 small-article">
-                        <img src="assets/img/noticias/balon_rugby.png" class="img-fluid w-100 mb-3" alt="Gobernanza">
-                        <span class="text-categoria d-block mb-1">Gobernanza</span>
-                        <h6>Executive Board election process confirmed</h6>
-                        <span class="text-fecha mt-2 d-block">2 octubre, 2026</span>
-                    </div>
+                    <php endforeach; ?>
                 </div>
+                <php endif; ?>
             </div>
 
+            !-- COMUNICADOS DE PRENSA --
             <div class="col-lg-4">
                 <h2 class="section-title-mag mb-4">Comunicados de Prensa</h2>
+                
+                ?php if (!empty($comunicados)): ?>
                 <ul class="list-group list-group-flush press-list">
-                    <li class="list-group-item d-flex align-items-start">
-                        <div class="press-number me-3 flex-shrink-0">1</div>
+                    ?php foreach ($comunicados as $index => $comunicado): ?>
+                    <li class="list-group-item d-flex align-items-start ?= ($index === count($comunicados) - 1) ? 'border-bottom-0' : '' ?>">
+                        <div class="press-number me-3 flex-shrink-0">?= $index + 1 ?></div>
                         <div class="w-100">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-categoria">RWC 2027</span>
-                                <span class="text-fecha">19 oct, 2026</span>
+                                <span class="text-categoria">?= e($comunicado['categoria']) ?></span>
+                                <span class="text-fecha"><= fechaEspCorta($comunicado['fecha_publicacion']) ?></span>
                             </div>
-                            <h6>Nuevo Colaborador Oficial de la Copa Mundial de Rugby...</h6>
+                            <h6><= e($comunicado['titulo']) ?></h6>
                         </div>
                     </li>
-                    <li class="list-group-item d-flex align-items-start border-bottom-0">
-                        <div class="press-number me-3 flex-shrink-0">2</div>
-                        <div class="w-100">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-categoria">SVNS</span>
-                                <span class="text-fecha">13 oct, 2026</span>
-                            </div>
-                            <h6>Fechas y sedes confirmados del HSBC SVNS 2...</h6>
-                        </div>
-                    </li>
+                    <php endforeach; ?>
                 </ul>
+                <php else: ?>
+                    <p class="text-muted small mt-3">No hay comunicados recientes.</p>
+                <php endif; ?>
+            </div>
+        </div>
+    </section>-->
+
+    <!-- P3 - NOTICIAS -->
+    <section class="container my-5">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-2" style="border-color: var(--verde-claro) !important;">
+                    <h2 class="section-title-mag border-0 pb-0 mb-0">Últimas Noticias</h2>
+                    <a href="noticias.php" class="btn btn-view-all btn-sm px-4 py-2 text-decoration-none">Ver Todo</a>
+                </div>
+
+                <!-- NOTICIA PRINCIPAL -->
+                <?php if ($noticia_principal): ?>
+                <div class="card main-article mb-4">
+                    <div class="row g-0 flex-column-reverse flex-md-row">
+                        <div class="col-md-5 p-4 d-flex flex-column justify-content-center">
+                            <span class="text-categoria mb-2"><?= e($noticia_principal['categoria']) ?></span>
+                            <h3 class="mb-3">
+                                <a href="articulo.php?id=<?= $noticia_principal['id'] ?>" class="text-decoration-none" style="color: var(--rojo-institucional);">
+                                    <?= e($noticia_principal['titulo']) ?>
+                                </a>
+                            </h3>
+                            <p class="text-muted small mb-4"><?= e($noticia_principal['extracto']) ?></p>
+                            <span class="text-fecha mt-auto">
+                                <?= fechaEsp($noticia_principal['fecha_publicacion']) ?> 
+                                <?= !empty($noticia_principal['tiempo_lectura']) ? " · Lectura: " . e($noticia_principal['tiempo_lectura']) : "" ?>
+                            </span>
+                        </div>
+                        <div class="col-md-7 overflow-hidden">
+                            <a href="articulo.php?id=<?= $noticia_principal['id'] ?>">
+                                <img src="<?= e($noticia_principal['imagen_url']) ?>" class="img-fluid h-100 object-fit-cover w-100 transition-scale" alt="<?= e($noticia_principal['titulo']) ?>" style="min-height: 250px;">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- NOTICIAS SECUNDARIAS -->
+                <?php if (!empty($noticias_secundarias)): ?>
+                <div class="row g-4 mt-2">
+                    <?php foreach ($noticias_secundarias as $secundaria): ?>
+                    <div class="col-md-4 small-article">
+                        <div class="overflow-hidden rounded mb-3">
+                            <a href="articulo.php?id=<?= $secundaria['id'] ?>">
+                                <img src="<?= e($secundaria['imagen_url']) ?>" class="img-fluid w-100 transition-scale" alt="<?= e($secundaria['titulo']) ?>">
+                            </a>
+                        </div>
+                        <span class="text-categoria d-block mb-1"><?= e($secundaria['categoria']) ?></span>
+                        <h6>
+                            <a href="articulo.php?id=<?= $secundaria['id'] ?>" class="text-decoration-none" style="color: var(--rojo-institucional);">
+                                <?= e($secundaria['titulo']) ?>
+                            </a>
+                        </h6>
+                        <span class="text-fecha mt-2 d-block"><?= fechaEsp($secundaria['fecha_publicacion']) ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- NOTAS DE PRENSA -->
+            <div class="col-lg-4">
+                <h2 class="section-title-mag mb-4">Notas de Prensa</h2>
+                
+                <?php if (!empty($comunicados)): ?>
+                <ul class="list-group list-group-flush press-list">
+                    <?php foreach ($comunicados as $index => $comunicado): ?>
+                    <li class="list-group-item d-flex align-items-start <?= ($index === count($comunicados) - 1) ? 'border-bottom-0' : '' ?>">
+                        <div class="press-number me-3 flex-shrink-0"><?= $index + 1 ?></div>
+                        <div class="w-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-categoria"><?= e($comunicado['categoria']) ?></span>
+                                <span class="text-fecha fw-bold"><?= fechaEspCorta($comunicado['fecha_publicacion']) ?></span>
+                            </div>
+                            <h6 class="mb-0">
+                                <a href="comunicado.php?id=<?= $comunicado['id'] ?>" class="text-decoration-none text-dark custom-hover-link">
+                                    <?= e($comunicado['titulo']) ?>
+                                </a>
+                            </h6>
+                        </div>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php else: ?>
+                    <p class="text-muted small mt-3">No hay notas de prensa recientes.</p>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -348,25 +532,68 @@ include 'includes/navbar.php';
     </section>
 
     <!-- P5 - PATROCINADORES -->
-    <section class="seccion-sponsors">
-        <h3 class="titulo-sponsors">NUESTROS SPONSORS</h3>
-        <div class="sponsors-principales">
-            <span class="sponsor-texto">Kingspan</span>
-            <span class="sponsor-texto">Antel</span>
-        </div>
-        <hr class="divisor-sponsors">
-        <div class="marquee-contenedor">
-            <div class="marquee-contenido">
-                <?php foreach($sponsors as $index => $sponsor_img): ?>
-                    <img src="<?= e($sponsor_img) ?>" alt="Sponsor <?= $index + 1 ?>" class="img-fluid marquee-item">
-                <?php endforeach; ?>
-                <?php foreach($sponsors as $index => $sponsor_img): ?>
-                    <img src="<?= e($sponsor_img) ?>" alt="Sponsor Clon <?= $index + 1 ?>" class="img-fluid marquee-item">
+    <section class="seccion-sponsors text-center">
+        <!-- <h3 class="titulo-sponsors mb-5">NUESTROS PATROCINADORES</h3> -->
+        
+        <!-- 1. NIVEL 1: PATROCINADORES PRINCIPALES (Fijos) -->
+        <?php if (!empty($sponsors_principales)): ?>
+        <div class="container mb-5">
+            <div class="row justify-content-center align-items-center g-4">
+                <?php foreach($sponsors_principales as $sponsor): ?>
+                    <div class="col-6 col-md-4 col-lg-3 text-center transition-scale">
+                        <?php if($sponsor['enlace'] != '#'): ?><a href="<?= e($sponsor['enlace']) ?>" target="_blank" rel="noopener noreferrer" class="text-decoration-none"><?php endif; ?>
+                        
+                        <img src="<?= e($sponsor['imagen_url']) ?>" alt="<?= e($sponsor['nombre']) ?>" title="<?= e($sponsor['nombre']) ?>" class="img-fluid mb-2" style="max-height: 90px; object-fit: contain;">
+                        
+                        <?php if($sponsor['enlace'] != '#'): ?></a><?php endif; ?>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
-        <div class="contenedor-boton">
-            <a href="#" class="btn-quiero-sponsor">QUIERO SER SPONSOR <i class="bi bi-arrow-right"></i></a>
+        <div class="container"><hr class="border-secondary mb-5 opacity-25"></div>
+        <?php endif; ?>
+
+        <!-- 2. NIVEL 2: SOCIOS TÉCNICOS (Carrusel hacia la IZQUIERDA) -->
+        <?php if (!empty($sponsors_tecnicos)): ?>
+        <!-- <h6 class="text-muted fw-bold mb-4 text-uppercase" style="letter-spacing: 2px; font-size: 0.8rem;">Socios Técnicos</h6> -->
+        <div class="marquee-contenedor mb-5">
+            <div class="marquee-contenido">
+                <?php 
+                // UX Fix: Calculamos cuántas veces clonar para llenar cualquier pantalla 
+                // (Si hay pocos logos, los repetimos 6 veces; si hay muchos, 2 veces).
+                $repeticiones_tecnicos = (count($sponsors_tecnicos) < 5) ? 6 : 2;
+                for ($i = 0; $i < $repeticiones_tecnicos; $i++): 
+                    foreach($sponsors_tecnicos as $sponsor): ?>
+                        <?php if($sponsor['enlace'] != '#'): ?><a href="<?= e($sponsor['enlace']) ?>" target="_blank"><?php endif; ?>
+                        <img src="<?= e($sponsor['imagen_url']) ?>" alt="<?= e($sponsor['nombre']) ?>" class="img-fluid marquee-item" style="max-height: 65px;">
+                        <?php if($sponsor['enlace'] != '#'): ?></a><?php endif; ?>
+                    <?php endforeach; 
+                endfor; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- 3. NIVEL 3: PROVEEDORES OFICIALES (Carrusel hacia la DERECHA) -->
+        <?php if (!empty($sponsors_proveedores)): ?>
+        <!-- <h6 class="text-muted fw-bold mb-4 text-uppercase" style="letter-spacing: 2px; font-size: 0.8rem;">Proveedores Oficiales</h6> -->
+        <div class="marquee-contenedor">
+            <div class="marquee-contenido-reverse">
+                <?php 
+                // Misma lógica matemática para la fila inferior
+                $repeticiones_proveedores = (count($sponsors_proveedores) < 5) ? 6 : 2;
+                for ($i = 0; $i < $repeticiones_proveedores; $i++): 
+                    foreach($sponsors_proveedores as $sponsor): ?>
+                        <?php if($sponsor['enlace'] != '#'): ?><a href="<?= e($sponsor['enlace']) ?>" target="_blank"><?php endif; ?>
+                        <img src="<?= e($sponsor['imagen_url']) ?>" alt="<?= e($sponsor['nombre']) ?>" class="img-fluid marquee-item" style="max-height: 55px;">
+                        <?php if($sponsor['enlace'] != '#'): ?></a><?php endif; ?>
+                    <?php endforeach; 
+                endfor; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <div class="contenedor-boton mt-5 pt-3">
+            <a href="mailto:comunicacion@mexrugby.com" class="btn-quiero-sponsor text-decoration-none">QUIERO SER SPONSOR <i class="bi bi-arrow-right"></i></a>
         </div>
     </section>
 
@@ -433,7 +660,6 @@ include 'includes/navbar.php';
         </div>
     </footer>-->
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <script>
