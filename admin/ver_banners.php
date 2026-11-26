@@ -1,44 +1,48 @@
 <?php
 // admin/ver_banners.php
-session_start();
-
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: index.php");
-    exit;
-}
-
-// Requerir conexión a BD y funciones globales (incluye $pdo y function e() )
+require_once __DIR__ . '/config/seguridad.php';
+exigir_sesion_admin();
 require_once __DIR__ . '/config/db.php';
+global $db;
 
-$mensaje = '';
-$tipo_mensaje = '';
-$custom_title = "Gestión de Banners";
+$custom_title = 'Gestión de Banners';
+$mensaje = $_SESSION['flash_mensaje'] ?? '';
+$tipo_mensaje = $_SESSION['flash_tipo'] ?? '';
+unset($_SESSION['flash_mensaje'], $_SESSION['flash_tipo']);
 
-try {
-    // === LÓGICA DE ELIMINACIÓN SEGURA (POST) ===
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_id'])) {
-        $id_eliminar = (int)$_POST['eliminar_id'];
-        
-        $stmtImg = $pdo->prepare("SELECT imagen_url FROM fmru_banners WHERE id = ?");
-        $stmtImg->execute([$id_eliminar]);
-        $imgTarget = $stmtImg->fetchColumn();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_id'])) {
+    if (!validar_csrf()) {
+        $_SESSION['flash_mensaje'] = 'Token de seguridad inválido. Intenta nuevamente.';
+        $_SESSION['flash_tipo'] = 'danger';
+    } else {
+        try {
+            $id_eliminar = (int)$_POST['eliminar_id'];
+            $imgTarget = $db->getImagenBanner($id_eliminar);
 
-        $stmtDel = $pdo->prepare("DELETE FROM fmru_banners WHERE id = ?");
-        if ($stmtDel->execute([$id_eliminar])) {
-            if ($imgTarget && file_exists("../" . $imgTarget)) {
-                unlink("../" . $imgTarget);
+            if ($db->eliminarBanner($id_eliminar)) {
+                if ($imgTarget) {
+                    $rutaFisica = dirname(__DIR__) . '/' . ltrim($imgTarget, '/');
+                    if (is_file($rutaFisica)) {
+                        unlink($rutaFisica);
+                    }
+                }
+                $_SESSION['flash_mensaje'] = 'Banner eliminado correctamente.';
+                $_SESSION['flash_tipo'] = 'success';
             }
-            $mensaje = "Banner eliminado correctamente.";
-            $tipo_mensaje = "success";
+        } catch (Throwable $e) {
+            $_SESSION['flash_mensaje'] = 'Error al intentar eliminar el banner.';
+            $_SESSION['flash_tipo'] = 'danger';
         }
     }
 
-    // === OBTENER LOS BANNERS PARA LA TABLA ===
-    $stmt = $pdo->query("SELECT * FROM fmru_banners ORDER BY orden ASC");
-    $banners = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    header('Location: ver_banners.php');
+    exit;
+}
 
-} catch (PDOException $e) {
-    die("Error de base de datos: " . e($e->getMessage()));
+try {
+    $banners = $db->getBannersAdmin();
+} catch (Throwable $e) {
+    die('Error de base de datos.');
 }
 ?>
 <!DOCTYPE html>
@@ -46,39 +50,38 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $custom_title ?> | Admin FMRU</title>
+    <title><?= e($custom_title) ?> | Admin FMRU</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="css/admin.css" rel="stylesheet">
 </head>
-
 <body class="admin-panel">
 
 <div class="d-flex">
-    
     <?php include __DIR__ . '/partials/sidebar.php'; ?>
 
     <div class="flex-grow-1">
-        
         <?php include __DIR__ . '/partials/topbar.php'; ?>
 
         <div class="container-fluid p-4">
-            <?php if ($mensaje): ?>
-                <div class="alert alert-<?= $tipo_mensaje ?> alert-dismissible fade show shadow-sm" role="alert">
-                    <?= $mensaje ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <?php if ($mensaje !== ''): ?>
+                <?php $clase_alerta = in_array($tipo_mensaje, ['success', 'danger', 'warning', 'info'], true) ? $tipo_mensaje : 'info'; ?>
+                <div class="alert alert-<?= $clase_alerta ?> alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+                    <i class="bi <?= $clase_alerta === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill' ?> me-2 fs-5"></i>
+                    <div><?= e($mensaje) ?></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
             <?php endif; ?>
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold" style="color: #bf2333;">Banners del Carrusel</h3>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                <h3 class="fw-bold mb-0" style="color: #bf2333;">Banners del Carrusel</h3>
                 <a href="banner_form.php" class="btn btn-success shadow-sm" style="background-color: #116436; border-color: #116436;">
                     <i class="bi bi-plus-lg me-1"></i> Agregar Banner
                 </a>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-3">
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0 table-custom">
@@ -93,7 +96,7 @@ try {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if(empty($banners)): ?>
+                                <?php if (empty($banners)): ?>
                                     <tr><td colspan="6" class="text-center py-4 text-muted">No hay banners registrados.</td></tr>
                                 <?php endif; ?>
 
@@ -112,9 +115,9 @@ try {
                                             <span class="badge bg-secondary">Inactivo</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-center pe-4">
-                                        <a href="banner_form.php?id=<?= $banner['id'] ?>" class="btn btn-sm btn-outline-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= $banner['id'] ?>" data-nombre="<?= e($banner['titulo']) ?>" title="Eliminar">
+                                    <td class="text-center pe-4 text-nowrap">
+                                        <a href="banner_form.php?id=<?= (int)$banner['id'] ?>" class="btn btn-sm btn-outline-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= (int)$banner['id'] ?>" data-nombre="<?= e($banner['titulo']) ?>" title="Eliminar">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -130,38 +133,36 @@ try {
 </div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow">
-      <div class="modal-header border-bottom-0 pb-0">
-        <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Eliminación</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-muted">
-        ¿Estás seguro que deseas eliminar el banner <strong id="modalBannerNombre" class="text-dark"></strong>? Esta acción no se puede deshacer y borrará la imagen del servidor.
-      </div>
-      <div class="modal-footer border-top-0 pt-0">
-        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
-        <form method="POST" action="">
-            <input type="hidden" name="eliminar_id" id="modalBannerId" value="">
-            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-        </form>
-      </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-muted">
+                ¿Estás seguro que deseas eliminar el banner <strong id="modalBannerNombre" class="text-dark"></strong>? Esta acción no se puede deshacer y borrará la imagen del servidor.
+            </div>
+            <div class="modal-footer border-top-0 pt-0">
+                <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="" data-no-resilience="true">
+                    <?= csrf_campo() ?>
+                    <input type="hidden" name="eliminar_id" id="modalBannerId" value="">
+                    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <script>if(!window.bootstrap){document.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"><\/script>');}</script> -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const deleteModal = document.getElementById('deleteModal');
         if (deleteModal) {
             deleteModal.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
-                const id = button.getAttribute('data-id');
-                const nombre = button.getAttribute('data-nombre');
-                
-                deleteModal.querySelector('#modalBannerId').value = id;
-                deleteModal.querySelector('#modalBannerNombre').textContent = '"' + nombre + '"';
+                deleteModal.querySelector('#modalBannerId').value = button.getAttribute('data-id');
+                deleteModal.querySelector('#modalBannerNombre').textContent = '"' + button.getAttribute('data-nombre') + '"';
             });
         }
     });

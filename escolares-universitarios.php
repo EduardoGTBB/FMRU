@@ -8,86 +8,79 @@ ini_set('session.cookie_secure', 1);
 ini_set('session.use_only_cookies', 1);
 session_start();
 
-function e($string) {
-    return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-}
+require_once __DIR__ . '/admin/config/db.php';
+global $db;
 
+$settings = $db->getAllSettings();
 $page_title = "Escolares y Universitarios"; 
+
+// Recuperar tarjetas en formato JSON
+$tarjetas_json = $settings['esc_tarjetas'] ?? '[]';
+$tarjetas = json_decode($tarjetas_json, true) ?: [];
+
+// Adaptación inteligente del Grid de Bootstrap según el total de tarjetas
+$col_class = (count($tarjetas) === 1) ? 'col-lg-8' : ((count($tarjetas) === 2 || count($tarjetas) === 4) ? 'col-lg-6' : 'col-lg-4');
+$border_colors = ['var(--verde-principal)', 'var(--rojo-institucional)', 'var(--azul-oscuro)', '#ffc107', '#17a2b8'];
 
 include 'includes/head.php';
 include 'includes/navbar.php'; 
 ?>
 
-    <!-- BANNER HERO 
-    <header class="hero-banner-escolar">
-        <div class="container">
-            <h1 class="display-4 fw-bold text-uppercase mb-3">Desarrollo Académico</h1>
-            <p class="lead mb-0">Forjando valores desde las escuelas hasta la universidad.</p>
-        </div>
-    </header>-->
-    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('assets/img/banner/06_competencias_escolares_universitarias.jpg'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
+    <!-- BANNER HERO DINÁMICO (ESTILO GLASSMORPHISM) -->
+    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('<?= e($settings['esc_hero_img'] ?? 'assets/img/banner/06_competencias_escolares_universitarias.jpg') ?>'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
         <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.3);"></div>
         <div class="container position-relative z-2">
             <div class="row justify-content-center">
                 <div class="col-lg-8 text-center">
                     <div class="glass-panel text-white shadow-lg">
-                        <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">Competencias</span>
-                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">Desarrollo Académico</h1>
-                        <p class="lead mb-0 fw-semibold opacity-75">Forjando valores desde las escuelas hasta la universidad.</p> 
+                        <?php $badge_esc = trim($settings['esc_hero_badge'] ?? 'Competencias'); ?>
+                        <?php if ($badge_esc !== ''): ?>
+                            <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">
+                                <?= e($badge_esc) ?>
+                            </span>
+                        <?php endif; ?>
+                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">
+                            <?= e($settings['esc_hero_titulo'] ?? 'DESARROLLO ACADÉMICO') ?>
+                        </h1>
+                        <p class="lead mb-0 fw-semibold opacity-75">
+                            <?= e($settings['esc_hero_sub'] ?? 'Forjando valores desde las escuelas hasta la universidad.') ?>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-
-    <main class="container my-5">
+    <main class="container my-5 pb-5">
         
-        <!-- SECCIÓN: RUGBY ESCOLAR -->
-        <section class="row align-items-center mb-5 pb-5 border-bottom">
-            <div class="col-lg-6 mb-4 mb-lg-0 pe-lg-5">
-                <span class="badge bg-success mb-2 px-3 py-2 text-uppercase">Nivel Básico y Medio</span>
-                <h2 class="fw-bold mb-4" style="color: var(--verde-principal);">Programa de Rugby Escolar</h2>
-                <p class="text-muted" style="line-height: 1.8;">
-                    El rugby es la herramienta perfecta para la educación física escolar. Promueve la inclusión (hay una posición para cada tipo de cuerpo), el respeto absoluto a la autoridad (el árbitro) y el compañerismo.
-                </p>
-                <p class="text-muted" style="line-height: 1.8;">
-                    Nuestros programas de iniciación (Tag Rugby) permiten a los colegios integrar este deporte de forma 100% segura, sin contacto, desarrollando habilidades motrices y valores fundamentales en niños y niñas por igual.
-                </p>
-                <ul class="list-unstyled mt-4 fw-semibold text-dark">
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Capacitación gratuita para profesores de E.F.</li>
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Kits de iniciación (Balones y Tags)</li>
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Torneos interescolares sin contacto</li>
-                </ul>
-            </div>
-            <div class="col-lg-6">
-                <!-- Imagen de contexto: usa una general del sitio por ahora -->
-                <div class="rounded-4 overflow-hidden shadow-lg border border-4" style="border-color: var(--verde-claro) !important;">
-                    <img src="assets/img/banner/930e3ac546bbc894c9ac9d9c1527d3a8.png" alt="Rugby Escolar" class="img-fluid w-100 object-fit-cover" style="height: 400px;">
-                </div>
+        <!-- TEXTO INTRODUCTORIO (HTML ENRIQUECIDO CON TINYMCE) -->
+        <section class="row justify-content-center mb-5">
+            <div class="col-lg-10 fs-5 text-dark" style="line-height: 1.8;">
+                <?= $settings['esc_intro'] ?? '<p class="text-center">En la federación creemos que los espacios escolares son idóneos para practicar el rugby.</p>' ?>
             </div>
         </section>
 
-        <!-- SECCIÓN: RUGBY UNIVERSITARIO -->
-        <section class="row align-items-center mb-5 flex-lg-row-reverse">
-            <div class="col-lg-6 mb-4 mb-lg-0 ps-lg-5">
-                <span class="badge mb-2 px-3 py-2 text-uppercase" style="background-color: var(--rojo-institucional);">Nivel Superior (CONDDE)</span>
-                <h2 class="fw-bold mb-4" style="color: var(--rojo-institucional);">Liga Universitaria</h2>
-                <p class="text-muted" style="line-height: 1.8;">
-                    El Campeonato Universitario es el puente entre el rugby juvenil y la primera fuerza nacional. Formamos parte del programa del <strong>Consejo Nacional del Deporte de la Educación (CONDDE)</strong>, teniendo al Rugby Sevens como deporte oficial en la Universiada Nacional.
-                </p>
-                <p class="text-muted" style="line-height: 1.8;">
-                    Las mejores instituciones de educación superior del país compiten año con año, ofreciendo a los estudiantes-atletas la posibilidad de representar a su Alma Máter mientras continúan con su desarrollo académico.
-                </p>
-                <a href="mailto:comunicacion@mexrugby.com" class="btn btn-outline-dark fw-bold mt-3 rounded-pill px-4">
-                    Afiliar a mi Universidad <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-            <div class="col-lg-6">
-                <div class="rounded-4 overflow-hidden shadow-lg border border-4" style="border-color: var(--rojo-oscuro) !important;">
-                    <img src="assets/img/banner/05_competencias_game_on.jpg" alt="Rugby Universitario" class="img-fluid w-100 object-fit-cover" style="height: 400px; filter: grayscale(20%);">
+        <!-- TARJETAS DE COMPETENCIAS (Bucle Dinámico) -->
+        <section class="row g-4 justify-content-center mb-5 pb-5 border-bottom border-secondary border-opacity-25">
+            <?php foreach($tarjetas as $i => $t): ?>
+            <div class="<?= $col_class ?> col-md-6 transition-scale">
+                <div class="card h-100 border-0 shadow-sm rounded-4 text-center px-4 py-5" style="border-top: 5px solid <?= $border_colors[$i % count($border_colors)] ?> !important;">
+                    <h4 class="fw-bold mb-4 text-dark"><?= e($t['titulo']) ?></h4>
+                    <div class="card-text text-muted" style="line-height: 1.6;">
+                        <!-- Se imprime el texto respetando el HTML del panel (negritas, alineación, etc) -->
+                        <?= $t['texto'] ?>
+                    </div>
                 </div>
             </div>
+            <?php endforeach; ?>
+        </section>
+
+        <!-- CALL TO ACTION FINAL -->
+        <section class="text-center pt-3">
+            <h3 class="fw-bold mb-4" style="color: var(--azul-oscuro);">¿Te interesa participar en alguno?</h3>
+            <a href="mailto:desarrollo@mexrugby.com" class="btn btn-rojo rounded-pill px-5 py-3 fw-bold shadow">
+                <i class="bi bi-envelope-fill me-2"></i> Escríbenos a desarrollo@mexrugby.com
+            </a>
         </section>
 
     </main>

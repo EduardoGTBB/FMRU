@@ -124,12 +124,69 @@ body {
     opacity: 0.12; /* Opacidad sutil como marca de agua */
     z-index: 0; 
 }
-.institucional-header {
+/*.institucional-header {
     padding: 50px 0 60px;
     width: 100%;
     position: relative;
     z-index: 1; 
+}*/
+.institucional-header {
+    padding-top: 50px;
+    padding-bottom: 60px;
+    width: 100%;
+    position: relative;
+    z-index: 1; 
 }
+
+/* =========================================
+   RESPONSIVO MÓVIL: QUIÉNES SOMOS
+   ========================================= */
+@media (max-width: 767.98px) {
+    .hero-background-quienes::before {
+        background-position: center;
+        background-size: 90% auto;
+        background-attachment: scroll; /* Evita fallos de renderizado en iOS/Safari */
+    }
+    .institucional-header {
+        padding-top: 35px;
+        padding-bottom: 40px;
+    }
+  /*  .hero-background-quienes .titulo-principal {
+        font-size: 2.25rem;
+        line-height: 1.15;
+    }*/
+
+    .hero-background-quienes .titulo-principal {
+    font-size: clamp(1.8rem, 7.5vw, 3.5rem) !important;
+    line-height: 1.1;
+    overflow-wrap: break-word;
+   }
+
+    .hero-background-quienes .titulo-seccion {
+        font-size: 1.6rem;
+    }
+    .hero-background-quienes .texto-cuerpo {
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+    .valores-container {
+        margin-top: 40px;
+        padding-bottom: 40px;
+    }
+    .drips-wrapper {
+        height: 100px;
+    }
+    .drip-item {
+        border-top-right-radius: 50px;
+    }
+    .drip-item span {
+        font-size: 2rem;
+    }
+    .drip-r, .drip-i, .drip-p, .drip-s {
+        margin-left: -15px;
+    }
+}
+
 .hero-background-quienes .titulo-principal, .hero-background-quienes .titulo-seccion { color: #111111 !important; font-weight: 800; text-transform: uppercase; margin-bottom: 1.5rem; }
 .hero-background-quienes .titulo-principal { font-size: 3.5rem; line-height: 1.1; }
 .hero-background-quienes .titulo-seccion { font-size: 2rem; margin-bottom: 1rem; }
@@ -616,4 +673,84 @@ body {
 .honor-row-dark:hover {
     background: #2a2a2a;
     border-left-color: var(--verde-principal);
+}
+
+/* =========================================
+   LISTA DE CONVOCATORIA (ROSTER TIPOGRÁFICO)
+   ========================================= */
+.roster-list-item {
+    transition: all 0.2s ease-in-out;
+    border-left: 3px solid transparent;
+    padding-left: 10px;
+}
+.roster-list-item:hover {
+    border-left-color: var(--verde-principal);
+    background-color: rgba(17, 100, 54, 0.03);
+    padding-left: 15px;
+    cursor: default;
+}
+.roster-number {
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: var(--rojo-institucional);
+    font-weight: 800;
+    width: 25px;
+    display: inline-block;
+}
+
+/* =========================================
+   DESARROLLO
+   ========================================= */
+.hero-banner-desarrollo { 
+    background-color: var(--verde-oscuro); 
+    background-image: linear-gradient(rgba(17, 100, 54, 0.75), rgba(17, 17, 17, 0.85)), url('../img/banner/Mesa-de-trabajo-25.png'); 
+    background-size: cover; 
+    background-position: center; 
+    color: white; 
+    padding: 100px 0; 
+    text-align: center; 
+}
+
+.desarrollo-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 3rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    margin-bottom: 2rem;
+    border-left: 5px solid var(--verde-principal);
+}
+
+.desarrollo-section.reverse {
+    border-left: none;
+    border-right: 5px solid var(--rojo-institucional);
+}
+
+.desarrollo-title {
+    font-weight: 800;
+    color: var(--azul-oscuro);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.desarrollo-img {
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    object-fit: cover;
+    height: 100%;
+    min-height: 250px;
+    width: 100%;
+}
+/* =========================================
+   FIX DE TIPOGRAFÍA PARA EDITOR DE TEXTO (OWASP/UX)
+   ========================================= */
+b, strong {
+    font-weight: 800 !important;
+}
+
+/* Evitar que imágenes rotas muestren el texto alternativo deformando el diseño */
+.desarrollo-img {
+    background-color: #f1f3f5;
+    color: #adb5bd;
+    font-size: 0.85rem;
+    text-align: center;
 }

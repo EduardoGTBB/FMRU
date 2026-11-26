@@ -1,6 +1,6 @@
 <?php
 /**
- * FEDERACIÓN MEXICANA DE RUGBY - LIGA XVS FEMENIL
+ * FEDERACIÓN MEXICANA DE RUGBY - SERPIENTES FEMENIL
  * Arquitectura Segura - OWASP Compliance
  * BASADO EN MANUAL DE IDENTIDAD FMRU 2026
  */
@@ -9,71 +9,57 @@ ini_set('session.cookie_secure', 1);
 ini_set('session.use_only_cookies', 1);
 session_start();
 
-function e($string) {
-    return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-}
+require_once __DIR__ . '/admin/config/db.php';
+global $db;
 
-// --- DATOS SIMULADOS PARA LA LIGA XVS FEMENIL ---
+$settings = $db->getAllSettings();
 
-// 1. Equipos Participantes (Puedes sustituirlos por los reales)
-$equipos_xvs = [
-    ["nombre" => "Pumas UNAM", "estado" => "Ciudad de México", "logo" => "P"],
-    ["nombre" => "Lobos Occidente", "estado" => "Jalisco", "logo" => "L"],
-    ["nombre" => "Black Thunder RC", "estado" => "Ciudad de México", "logo" => "B"],
-    ["nombre" => "Legión Cuervos", "estado" => "Ciudad de México", "logo" => "L"],
-    ["nombre" => "Abejas Guanajuato", "estado" => "Guanajuato", "logo" => "A"],
-    ["nombre" => "ITESO Rugby", "estado" => "Jalisco", "logo" => "I"],
-    ["nombre" => "Tiburones Cancún", "estado" => "Quintana Roo", "logo" => "T"],
-    ["nombre" => "Templarios RC", "estado" => "Ciudad de México", "logo" => "T"]
-];
+// 1. Equipos Participantes (Dinámicos desde BD)
+$equipos_xvs = json_decode($settings['sptf_equipos'] ?? '[]', true) ?: [];
 
-// 2. Histórico de Campeonatos (Adaptado de la tabla histórica)
-$historico_campeonas = [
-    ["temporada" => "2024 - 2025", "campeon" => "Pumas UNAM", "subcampeon" => "Black Thunder RC", "mvp" => "Isabela González"],
-    ["temporada" => "2023 - 2024", "campeon" => "Lobos Occidente", "subcampeon" => "Legión Cuervos", "mvp" => "Tamara Raya Cano"],
-    ["temporada" => "2022 - 2023", "campeon" => "Pumas UNAM", "subcampeon" => "Abejas Guanajuato", "mvp" => "Verónica Estrada"],
-    ["temporada" => "2021 - 2022", "campeon" => "Black Thunder RC", "subcampeon" => "Tiburones Cancún", "mvp" => "Karina Landeros"],
-    ["temporada" => "2019 - 2020", "campeon" => "Pumas UNAM", "subcampeon" => "Templarios RC", "mvp" => "Cristina Uribe"]
-];
+// 2. Staff Técnico (Dinámico desde BD)
+$staff = json_decode($settings['sptf_staff'] ?? '[]', true) ?: [];
 
-// Define el título de la página
-$page_title = "Inicio"; 
+// 3. Histórico de Campeonas (Dinámico desde BD)
+$historico_campeonas = json_decode($settings['sptf_historico'] ?? '[]', true) ?: [];
+
+$page_title = "Serpientes Femenil"; 
 
 include 'includes/head.php';
 include 'includes/navbar.php'; 
 ?>
 
-    <!-- BANNER HERO -->
-    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('assets/img/banner/BloodFest26-1589.jpg'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
+    <!-- BANNER HERO DINÁMICO -->
+    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('<?= e($settings['sptf_hero_img'] ?? 'assets/img/banner/BloodFest26-1589.jpg') ?>'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
         <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.3);"></div>
         <div class="container position-relative z-2">
             <div class="row justify-content-center">
                 <div class="col-lg-8 text-center">
                     <div class="glass-panel text-white shadow-lg">
-                        <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">Serpientes</span>
-                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">Liga de Rugby Femenil</h1>
-                        <p class="lead mb-0 fw-semibold opacity-75">La máxima categoría del rugby union femenil en México.</p>
+                        <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">
+                            <?= e($settings['sptf_hero_badge'] ?? 'Serpientes') ?>
+                        </span>
+                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">
+                            <?= e($settings['sptf_hero_titulo'] ?? 'Liga de Rugby Femenil') ?>
+                        </h1>
+                        <p class="lead mb-0 fw-semibold opacity-75">
+                            <?= e($settings['sptf_hero_sub'] ?? 'La máxima categoría del rugby union femenil en México.') ?>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </header>
-    <!-- <header class="hero-banner-xvs">
-        <div class="container">
-            <h1 class="display-4 fw-bold text-uppercase"></h1>
-            <p class="lead mb-0"></p>
-        </div>
-    </header> -->
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="container my-5">
         
-        <!-- SECCIÓN: INTRODUCCIÓN -->
+        <!-- SECCIÓN: INTRODUCCIÓN (HTML ENRIQUECIDO) -->
         <section class="row mb-5 text-center">
             <div class="col-lg-8 mx-auto">
-                <p class="lead text-muted">
-                    El Campeonato Nacional de Rugby XVs Femenil es la competición de mayor nivel y exigencia física en nuestro país. Reúne a los mejores clubes de diversas regiones para disputar el título nacional, fomentando el desarrollo continuo del rugby femenino, el trabajo en equipo y la formación de futuras seleccionadas nacionales.
-                </p>
+                <div class="fs-5 text-muted" style="line-height: 1.8;">
+                    <?= $settings['sptf_intro'] ?? '<p>El Campeonato Nacional de Rugby XVs Femenil es la competición de mayor nivel y exigencia física en nuestro país.</p>' ?>
+                </div>
             </div>
         </section>
 
@@ -90,7 +76,7 @@ include 'includes/navbar.php';
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
                     <div class="team-card">
                         <div class="team-logo-placeholder">
-                            <?= e($equipo['logo']) ?>
+                            <?= e($equipo['logo'] ?? mb_strtoupper(mb_substr($equipo['nombre'], 0, 1, 'UTF-8'), 'UTF-8')) ?>
                         </div>
                         <h4 class="team-name"><?= e($equipo['nombre']) ?></h4>
                         <div class="team-state"><i class="bi bi-geo-alt-fill text-danger me-1"></i><?= e($equipo['estado']) ?></div>
@@ -100,7 +86,34 @@ include 'includes/navbar.php';
             </div>
         </section>
 
-        <!-- SECCIÓN: HISTÓRICO DE CAMPEONATOS -->
+        <!-- SECCIÓN: STAFF TÉCNICO (DINÁMICO) -->
+        <?php if (!empty($staff)): ?>
+        <section class="mb-5 pb-5 border-bottom">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="section-title border-0 pb-0 mb-2">Staff Técnico</h2>
+                </div>
+            </div>
+            
+            <div class="row g-3">
+                <?php foreach($staff as $miembro): ?>
+                <div class="col-lg-4 col-md-6">
+                    <div class="staff-card shadow-sm bg-white">
+                        <div class="staff-icon">
+                            <i class="bi <?= e($miembro['icono'] ?? 'bi-person-badge-fill') ?>"></i>
+                        </div>
+                        <div>
+                            <div class="staff-role"><?= e($miembro['rol']) ?></div>
+                            <h4 class="staff-name"><?= e($miembro['nombre']) ?></h4>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <!-- SECCIÓN: HISTÓRICO DE CAMPEONATOS (DINÁMICO) -->
         <section class="mb-5">
             <div class="row mb-4">
                 <div class="col-12">
@@ -143,7 +156,5 @@ include 'includes/navbar.php';
 
     <!-- FOOTER MODULAR -->
     <?php include 'includes/footer.php'; ?>
-
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>
 </html>

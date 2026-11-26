@@ -9,20 +9,14 @@ ini_set('session.use_only_cookies', 1);
 session_start();
 
 require_once __DIR__ . '/admin/config/db.php';
+global $db;
 
-// 1. Equipos Participantes
-$equipos_xvs = [
-    ["nombre" => "Pumas UNAM", "estado" => "Ciudad de México", "logo" => "P"],
-    ["nombre" => "Lobos Occidente", "estado" => "Jalisco", "logo" => "L"],
-    ["nombre" => "Black Thunder RC", "estado" => "Ciudad de México", "logo" => "B"],
-    ["nombre" => "Legión Cuervos", "estado" => "Ciudad de México", "logo" => "L"],
-    ["nombre" => "Abejas Guanajuato", "estado" => "Guanajuato", "logo" => "A"],
-    ["nombre" => "ITESO Rugby", "estado" => "Jalisco", "logo" => "I"],
-    ["nombre" => "Tiburones Cancún", "estado" => "Quintana Roo", "logo" => "T"],
-    ["nombre" => "Templarios RC", "estado" => "Ciudad de México", "logo" => "T"]
-];
+$settings = $db->getAllSettings();
 
-// 2. Histórico de Campeonatos (Salón de la Fama)
+// 1. Equipos Participantes (Dinámicos desde BD)
+$equipos_xvs = json_decode($settings['xvsf_clubes'] ?? '[]', true) ?: [];
+
+// 2. Histórico de Campeonatos (Salón de la Fama - En código por el momento)
 $historico_campeonas = [
     ["temporada" => "2024 - 2025", "campeon" => "Pumas UNAM", "subcampeon" => "Black Thunder RC", "mvp" => "Isabela González"],
     ["temporada" => "2023 - 2024", "campeon" => "Lobos Occidente", "subcampeon" => "Legión Cuervos", "mvp" => "Tamara Raya Cano"],
@@ -35,17 +29,22 @@ include 'includes/head.php';
 include 'includes/navbar.php'; 
 ?>
 
-    <!-- HERO EFECTO CRISTAL CON FALLBACK SEGURO -->
-    <!-- FIX: Añadimos un backgroundColor corporativo de respaldo por si la imagen falla -->
-    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('assets/img/banner/BloodFest26-1589.jpg'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
+    <!-- HERO EFECTO CRISTAL DINÁMICO -->
+    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('<?= e($settings['xvsf_hero_img'] ?? 'assets/img/banner/BloodFest26-1589.jpg') ?>'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
         <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.3);"></div>
         <div class="container position-relative z-2">
             <div class="row justify-content-center">
                 <div class="col-lg-8 text-center">
                     <div class="glass-panel text-white shadow-lg">
-                        <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">Primera Fuerza</span>
-                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">Liga XVs Femenil</h1>
-                        <p class="lead mb-0 fw-semibold opacity-75">La élite del rugby union femenino en México.</p>
+                        <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">
+                            <?= e($settings['xvsf_hero_badge'] ?? 'Primera Fuerza') ?>
+                        </span>
+                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">
+                            <?= e($settings['xvsf_hero_titulo'] ?? 'Liga XVs Femenil') ?>
+                        </h1>
+                        <p class="lead mb-0 fw-semibold opacity-75">
+                            <?= e($settings['xvsf_hero_sub'] ?? 'La élite del rugby union femenino en México.') ?>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -54,16 +53,16 @@ include 'includes/navbar.php';
 
     <main class="container my-5 pb-5">
         
-        <!-- INTRODUCCIÓN -->
+        <!-- INTRODUCCIÓN (HTML ENRIQUECIDO) -->
         <section class="row mb-5 justify-content-center text-center">
             <div class="col-lg-8">
-                <p class="lead text-muted" style="line-height: 1.8;">
-                    Reuniendo a los clubes más fuertes del país en un formato de alta exigencia física y táctica. El semillero oficial de las futuras seleccionadas nacionales.
-                </p>
+                <div class="fs-5 text-muted" style="line-height: 1.8;">
+                    <?= $settings['xvsf_intro'] ?? '<p>Reuniendo a los clubes más fuertes del país en un formato de alta exigencia física y táctica.</p>' ?>
+                </div>
             </div>
         </section>
 
-        <!-- CLUBES: GRID MODERNO -->
+        <!-- CLUBES: GRID MODERNO DINÁMICO -->
         <section class="mb-5 pb-5 border-bottom border-secondary border-opacity-25">
             <h3 class="fw-bold text-uppercase mb-5 text-center" style="color: var(--verde-principal); letter-spacing: 1px;">Clubes Participantes</h3>
             
@@ -72,7 +71,7 @@ include 'includes/navbar.php';
                 <div class="col-xl-3 col-lg-4 col-md-6">
                     <div class="club-card-modern p-4 text-center h-100">
                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3 border" style="width: 80px; height: 80px; font-size: 2rem; color: var(--verde-principal); font-weight: 900;">
-                            <?= e($equipo['logo']) ?>
+                            <?= e($equipo['logo'] ?? mb_strtoupper(mb_substr($equipo['nombre'], 0, 1, 'UTF-8'), 'UTF-8')) ?>
                         </div>
                         <h5 class="fw-bold text-dark mb-1"><?= e($equipo['nombre']) ?></h5>
                         <span class="badge bg-light text-secondary border px-3 py-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i> <?= e($equipo['estado']) ?></span>
@@ -82,7 +81,7 @@ include 'includes/navbar.php';
             </div>
         </section>
 
-        <!-- SALÓN DE LA FAMA (Timeline/Leaderboard) -->
+        <!-- SALÓN DE LA FAMA (Timeline/Leaderboard - En código) -->
         <section class="mb-5">
             <div class="text-center mb-5">
                 <h3 class="fw-bold text-uppercase" style="color: var(--rojo-institucional); letter-spacing: 1px;">Salón de la Fama</h3>

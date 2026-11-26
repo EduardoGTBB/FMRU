@@ -10,20 +10,7 @@ session_start();
 
 require_once __DIR__ . '/admin/config/db.php';
 
-try {
-    // $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $db_user, $db_pass);
-    // $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-
-    // --- OBTENER NOTICIAS (Separadas por tipo) ---
-    // 1. Noticia Principal (La más reciente)
-    /*$stmtPrincipal = $pdo->query("SELECT * FROM fmru_noticias WHERE activo = 1 AND tipo = 'principal' ORDER BY fecha_publicacion DESC, id DESC LIMIT 1");
-    $noticia_principal = $stmtPrincipal->fetch(PDO::FETCH_ASSOC);
-
-    // 2. Noticias Secundarias (Las 3 más recientes)
-    $stmtSecundarias = $pdo->query("SELECT * FROM fmru_noticias WHERE activo = 1 AND tipo = 'secundaria' ORDER BY fecha_publicacion DESC, id DESC LIMIT 3");
-    $noticias_secundarias = $stmtSecundarias->fetchAll(PDO::FETCH_ASSOC);*/
-    // --- OBTENER LAS 4 NOTICIAS MÁS RECIENTES ---
+/*try {
     // La consulta las trae ordenadas por fecha. Luego PHP las separará.
     $stmtNoticias = $pdo->query("SELECT * FROM fmru_noticias WHERE activo = 1 AND tipo != 'comunicado' ORDER BY fecha_publicacion DESC, id DESC LIMIT 4");
     $todas_noticias = $stmtNoticias->fetchAll(PDO::FETCH_ASSOC);
@@ -60,6 +47,36 @@ try {
 
 } catch (PDOException $e) {
     die("Error de conexión"); // En producción, registra el error y muestra un mensaje amigable
+}*/
+try {
+    // Obtenemos los datos con una sola línea por bloque
+    $todas_noticias = $db->getNoticiasRecientes(4);
+    $comunicados    = $db->getComunicadosRecientes(4);
+    $banners_activos = $db->getBannersActivos();
+    $todos_sponsors  = $db->getSponsorsActivos();
+
+    // Separamos la noticia principal de las secundarias
+    $noticia_principal = !empty($todas_noticias) ? array_shift($todas_noticias) : null;
+    $noticias_secundarias = $todas_noticias;
+    
+    // Clasificamos los sponsors
+    $sponsors_principales = [];
+    $sponsors_tecnicos = [];
+    $sponsors_proveedores = [];
+    
+    foreach ($todos_sponsors as $sp) {
+        if ($sp['nivel'] === 'Patrocinador Principal') {
+            $sponsors_principales[] = $sp;
+        } elseif ($sp['nivel'] === 'Socio Técnico') {
+            $sponsors_tecnicos[] = $sp;
+        } else {
+            $sponsors_proveedores[] = $sp;
+        }
+    }
+
+} catch (Exception $e) {
+    error_log("Error cargando el Home: " . $e->getMessage());
+    die("Error interno cargando la plataforma."); 
 }
  
 function e($string) {
@@ -266,76 +283,6 @@ include 'includes/navbar.php';
         </div>
     </section>
 
-    <!-- P3 - NOTICIAS 
-    <section class="container my-5">
-        <div class="row g-5">
-            <div class="col-lg-8">
-                <div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-2" style="border-color: var(--verde-claro) !important;">
-                    <h2 class="section-title-mag border-0 pb-0 mb-0">Últimas Noticias</h2>
-                    <a href="#" class="btn btn-view-all btn-sm px-4 py-2 text-decoration-none">Ver Todo</a>
-                </div>
-
-                !-- NOTICIA PRINCIPAL --
-                <php if ($noticia_principal): ?>
-                <div class="card main-article mb-4">
-                    <div class="row g-0 flex-column-reverse flex-md-row">
-                        <div class="col-md-5 p-4 d-flex flex-column justify-content-center">
-                            <span class="text-categoria mb-2"><= e($noticia_principal['categoria']) ?></span>
-                            <h3 class="mb-3"><= e($noticia_principal['titulo']) ?></h3>
-                            <p class="text-muted small mb-4"><= e($noticia_principal['extracto']) ?></p>
-                            <span class="text-fecha mt-auto">
-                                <= fechaEsp($noticia_principal['fecha_publicacion']) ?> 
-                                <= !empty($noticia_principal['tiempo_lectura']) ? " · Lectura: " . e($noticia_principal['tiempo_lectura']) : "" ?>
-                            </span>
-                        </div>
-                        <div class="col-md-7">
-                            <img src="<= e($noticia_principal['imagen_url']) ?>" class="img-fluid h-100 object-fit-cover w-100" alt="<= e($noticia_principal['titulo']) ?>" style="min-height: 250px;">
-                        </div>
-                    </div>
-                </div>
-                <php endif; ?>
-
-                !-- NOTICIAS SECUNDARIAS --
-                <php if (!empty($noticias_secundarias)): ?>
-                <div class="row g-4 mt-2">
-                    <php foreach ($noticias_secundarias as $secundaria): ?>
-                    <div class="col-md-4 small-article">
-                        <img src="<= e($secundaria['imagen_url']) ?>" class="img-fluid w-100 mb-3" alt="<= e($secundaria['titulo']) ?>">
-                        <span class="text-categoria d-block mb-1"><= e($secundaria['categoria']) ?></span>
-                        <h6><= e($secundaria['titulo']) ?></h6>
-                        <span class="text-fecha mt-2 d-block"><= fechaEsp($secundaria['fecha_publicacion']) ?></span>
-                    </div>
-                    <php endforeach; ?>
-                </div>
-                <php endif; ?>
-            </div>
-
-            !-- COMUNICADOS DE PRENSA --
-            <div class="col-lg-4">
-                <h2 class="section-title-mag mb-4">Comunicados de Prensa</h2>
-                
-                ?php if (!empty($comunicados)): ?>
-                <ul class="list-group list-group-flush press-list">
-                    ?php foreach ($comunicados as $index => $comunicado): ?>
-                    <li class="list-group-item d-flex align-items-start ?= ($index === count($comunicados) - 1) ? 'border-bottom-0' : '' ?>">
-                        <div class="press-number me-3 flex-shrink-0">?= $index + 1 ?></div>
-                        <div class="w-100">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-categoria">?= e($comunicado['categoria']) ?></span>
-                                <span class="text-fecha"><= fechaEspCorta($comunicado['fecha_publicacion']) ?></span>
-                            </div>
-                            <h6><= e($comunicado['titulo']) ?></h6>
-                        </div>
-                    </li>
-                    <php endforeach; ?>
-                </ul>
-                <php else: ?>
-                    <p class="text-muted small mt-3">No hay comunicados recientes.</p>
-                <php endif; ?>
-            </div>
-        </div>
-    </section>-->
-
     <!-- P3 - NOTICIAS -->
     <section class="container my-5">
         <div class="row g-5">
@@ -533,8 +480,6 @@ include 'includes/navbar.php';
 
     <!-- P5 - PATROCINADORES -->
     <section class="seccion-sponsors text-center">
-        <!-- <h3 class="titulo-sponsors mb-5">NUESTROS PATROCINADORES</h3> -->
-        
         <!-- 1. NIVEL 1: PATROCINADORES PRINCIPALES (Fijos) -->
         <?php if (!empty($sponsors_principales)): ?>
         <div class="container mb-5">
@@ -555,7 +500,6 @@ include 'includes/navbar.php';
 
         <!-- 2. NIVEL 2: SOCIOS TÉCNICOS (Carrusel hacia la IZQUIERDA) -->
         <?php if (!empty($sponsors_tecnicos)): ?>
-        <!-- <h6 class="text-muted fw-bold mb-4 text-uppercase" style="letter-spacing: 2px; font-size: 0.8rem;">Socios Técnicos</h6> -->
         <div class="marquee-contenedor mb-5">
             <div class="marquee-contenido">
                 <?php 
@@ -575,7 +519,6 @@ include 'includes/navbar.php';
 
         <!-- 3. NIVEL 3: PROVEEDORES OFICIALES (Carrusel hacia la DERECHA) -->
         <?php if (!empty($sponsors_proveedores)): ?>
-        <!-- <h6 class="text-muted fw-bold mb-4 text-uppercase" style="letter-spacing: 2px; font-size: 0.8rem;">Proveedores Oficiales</h6> -->
         <div class="marquee-contenedor">
             <div class="marquee-contenido-reverse">
                 <?php 
@@ -598,67 +541,6 @@ include 'includes/navbar.php';
     </section>
 
     <?php include 'includes/footer.php'; ?>
-
-    <!-- P6 - FOOTER 
-    <footer class="bg-dark text-white pt-5 pb-3 border-top" style="border-color: var(--verde-claro) !important; border-width: 5px !important;">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-5 col-md-6 mb-4">
-                    <img src="assets/img/logo/rugby-mexico-logo.png" alt="Logo Rugby México" height="60" class="mb-3 bg-white p-2 rounded" style="object-fit: contain;">
-                    <h6 class="fw-bold mb-2">FEDERACIÓN MEXICANA DE RUGBY, A.C.</h6>
-                    <p class="small text-light text-opacity-75 pe-md-4 lh-lg">
-                        <i class="bi bi-geo-alt-fill text-danger me-2"></i>
-                        Vicente Segura 10 Casa 2, Lomas de Sotelo,<br>
-                        Naucalpan de Juárez, Estado de México, C.P. 53390
-                    </p>
-                </div>
-
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h6 class="text-uppercase fw-bold mb-3" style="color: var(--verde-claro);">Información Adicional</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none custom-hover-link">Antidoping</a></li>
-                        <li class="mb-2"><a href="https://www.world.rugby/" target="_blank" rel="noopener noreferrer" class="text-light text-decoration-none custom-hover-link">World Rugby</a></li>
-                        <li class="mb-2"><a href="https://rugbyamericasnorth.com/" target="_blank" rel="noopener noreferrer" class="text-light text-decoration-none custom-hover-link">Rugby Americas North</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none custom-hover-link">Políticas de Privacidad</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-4 col-md-12 mb-4">
-                    <h6 class="text-uppercase fw-bold mb-3" style="color: var(--rojo-institucional);">Contacto</h6>
-                    <ul class="list-unstyled small text-light text-opacity-75 mb-4">
-                        <li class="mb-2">
-                            <a href="mailto:comunicacion@mexrugby.com" class="text-light text-decoration-none custom-hover-link">
-                                <i class="bi bi-envelope-fill me-2 text-danger"></i> comunicacion@mexrugby.com
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="tel:+525555761274" class="text-light text-decoration-none custom-hover-link">
-                                <i class="bi bi-telephone-fill me-2 text-danger"></i> (+52 55) 5576 1274
-                            </a>
-                        </li>
-                    </ul>
-                    
-                    <h6 class="text-uppercase fw-bold mb-3" style="color: var(--verde-claro);">Redes Sociales</h6>
-                    <div class="d-flex align-items-center gap-3">
-                        <a href="https://www.facebook.com/RugbyMexico" class="text-white d-flex align-items-center justify-content-center transition-scale" target="_blank" aria-label="Facebook" style="width: 32px; height: 32px;"><i class="bi bi-facebook fs-4"></i></a>
-                        <a href="https://www.instagram.com/rugby_mexico/?hl=es" class="text-white d-flex align-items-center justify-content-center transition-scale" target="_blank" aria-label="Instagram" style="width: 32px; height: 32px;"><i class="bi bi-instagram fs-4"></i></a>
-                        <a href="https://x.com/Rugby_Mexico" class="text-white d-flex align-items-center justify-content-center transition-scale" target="_blank" aria-label="Twitter / X" style="width: 32px; height: 32px;"><i class="bi bi-twitter-x fs-4"></i></a>
-                        <a href="https://www.youtube.com/user/FMRUOficial" class="text-white d-flex align-items-center justify-content-center transition-scale" target="_blank" aria-label="YouTube" style="width: 32px; height: 32px;"><i class="bi bi-youtube fs-3"></i></a>
-                    </div>
-                </div>
-            </div>
-            <hr class="border-secondary mt-3 opacity-25">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start small text-muted">
-                    &copy; <span id="currentYear"></span> Federación Mexicana de Rugby, A.C. Todos los derechos reservados.
-                </div>
-                <div class="col-md-6 text-center text-md-end small text-muted mt-2 mt-md-0">
-                    <a href="#" class="text-muted text-decoration-none me-3 hover-white">Políticas de Privacidad</a>
-                    <a href="#" class="text-muted text-decoration-none hover-white">Términos Legales</a>
-                </div>
-            </div>
-        </div>
-    </footer>-->
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     

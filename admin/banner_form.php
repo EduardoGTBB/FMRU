@@ -1,176 +1,111 @@
 <?php
 // admin/banner_form.php
-session_start();
-
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: index.php");
-    exit;
-}
-
+require_once __DIR__ . '/config/seguridad.php';
+exigir_sesion_admin();
 require_once __DIR__ . '/config/db.php';
+global $db;
 
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$id = isset($_GET['id']) ? max(0, (int)$_GET['id']) : 0;
 $accion = $id ? 'Editar' : 'Agregar';
 $custom_title = "$accion Banner";
 
 $mensaje = '';
 $tipo_mensaje = '';
 
-// Variables por defecto
 $titulo = '';
 $subtitulo = '';
 $activo = 1;
 $imagen_url_actual = '';
 
-// Lógica para obtener el último orden
 if (!$id) {
-    $stmtMax = $pdo->query("SELECT MAX(orden) FROM fmru_banners");
-    $maxOrden = $stmtMax->fetchColumn();
+    $maxOrden = $db->getMaxOrdenBanner();
     $orden = $maxOrden ? (int)$maxOrden + 1 : 1;
 } else {
-    $orden = 0; 
-}
-
-// Cargar datos si es edición
-if ($id) {
-    $stmt = $pdo->prepare("SELECT * FROM fmru_banners WHERE id = ?");
-    $stmt->execute([$id]);
-    $banner = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    $banner = $db->getBannerById($id);
     if ($banner) {
-        $titulo = $banner['titulo'];
-        $subtitulo = $banner['subtitulo'];
-        $orden = (int)$banner['orden']; // Guardamos el orden original
-        $activo = $banner['activo'];
+        $titulo            = $banner['titulo'];
+        $subtitulo         = $banner['subtitulo'];
+        $orden             = (int)$banner['orden'];
+        $activo            = (int)$banner['activo'];
         $imagen_url_actual = $banner['imagen_url'];
     } else {
-        header("Location: ver_banners.php");
+        header('Location: ver_banners.php');
         exit;
     }
 }
 
-// Procesar Formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // OWASP: Recibir datos preservando acentos
-    $titulo_post = recibir_post('titulo');
+    $titulo_post    = recibir_post('titulo');
     $subtitulo_post = recibir_post('subtitulo');
-    $orden_post = (int)$_POST['orden'];
-    $activo_post = isset($_POST['activo']) ? 1 : 0;
-    
-    $imagen_final = $imagen_url_actual;
+    $orden_post     = max(1, (int)($_POST['orden'] ?? 1));
+    $activo_post    = isset($_POST['activo']) ? 1 : 0;
+    $imagen_final   = $imagen_url_actual;
 
-    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['imagen']['tmp_name'];
-        $fileName = $_FILES['imagen']['name'];
-        $fileSize = $_FILES['imagen']['size'];
-        
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedfileExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-        
-        $image_info = getimagesize($fileTmpPath);
-        
-        if ($image_info !== false) {
-            $mime = $image_info['mime'];
-            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
-
-            if (in_array($fileExtension, $allowedfileExtensions) && in_array($mime, $allowedMimeTypes)) {
-                if ($fileSize < 2 * 1024 * 1024) { 
-                    $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-                    $uploadFileDir = dirname(__DIR__) . '/assets/img/banner/';
-                    
-                    if (!is_dir($uploadFileDir)) {
-                        mkdir($uploadFileDir, 0755, true);
-                    }
-
-                    $dest_path = $uploadFileDir . $newFileName;
-
-                    if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                        $imagen_final = 'assets/img/banner/' . $newFileName;
-                    } else {
-                        $mensaje = 'Error al guardar la imagen. Verifica los permisos de escritura.';
-                        $tipo_mensaje = 'danger';
-                    }
-                } else {
-                    $mensaje = 'El archivo supera el límite de 2MB.';
-                    $tipo_mensaje = 'danger';
-                }
-            } else {
-                $mensaje = 'Formato no permitido. Solo JPG, PNG y WEBP.';
-                $tipo_mensaje = 'danger';
-            }
-        } else {
-            $mensaje = 'El archivo subido no es una imagen válida o está corrupto.';
-            $tipo_mensaje = 'danger';
-        }
-    } elseif (!$id && empty($_FILES['imagen']['name'])) {
-        $mensaje = 'Debes subir una imagen para el nuevo banner.';
+    if (!validar_csrf()) {
+        $mensaje = 'Token de seguridad inválido. Intenta guardar nuevamente.';
         $tipo_mensaje = 'danger';
-    }
-
-    if (empty($mensaje)) {
+    } elseif ($titulo_post === '') {
+        $mensaje = 'El título principal es obligatorio.';
+        $tipo_mensaje = 'danger';
+    } else {
         try {
-            // INICIO DE TRANSACCIÓN SEGURA (OWASP)
-            $pdo->beginTransaction(); 
+            $nueva_img = procesar_imagen_segura('imagen', 'assets/img/banner', 'banner');
+            if ($nueva_img !== null) {
+                $imagen_final = $nueva_img;
+            } elseif (!$id) {
+                throw new RuntimeException('Debes seleccionar una imagen para el nuevo banner.');
+            }
+
+            $db->beginTransaction();
 
             if ($id) {
-                // 1. Lógica de Intercambio (Swap) para Edición
                 if ($orden !== $orden_post) {
-                    $stmtConflicto = $pdo->prepare("SELECT id FROM fmru_banners WHERE orden = ? AND id != ?");
-                    $stmtConflicto->execute([$orden_post, $id]);
-                    $id_conflicto = $stmtConflicto->fetchColumn();
-
+                    $id_conflicto = $db->getBannerIdByOrden($orden_post, $id);
                     if ($id_conflicto) {
-                        $stmtSwap = $pdo->prepare("UPDATE fmru_banners SET orden = ? WHERE id = ?");
-                        $stmtSwap->execute([$orden, $id_conflicto]);
+                        $db->updateBannerOrden($id_conflicto, $orden);
                     }
                 }
-
-                $sql = "UPDATE fmru_banners SET titulo=?, subtitulo=?, imagen_url=?, orden=?, activo=? WHERE id=?";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$titulo_post, $subtitulo_post, $imagen_final, $orden_post, $activo_post, $id]);
-                
-                $mensaje = 'Banner actualizado exitosamente.';
+                $db->updateBanner($id, $titulo_post, $subtitulo_post, $imagen_final, $orden_post, $activo_post);
+                $mensaje = 'Banner actualizado correctamente.';
                 $imagen_url_actual = $imagen_final;
             } else {
-                // 2. Lógica de Desplazamiento (Shift) para Nuevos
-                $stmtConflicto = $pdo->prepare("SELECT id FROM fmru_banners WHERE orden = ?");
-                $stmtConflicto->execute([$orden_post]);
-                
-                if ($stmtConflicto->fetchColumn()) {
-                    $stmtShift = $pdo->prepare("UPDATE fmru_banners SET orden = orden + 1 WHERE orden >= ?");
-                    $stmtShift->execute([$orden_post]);
+                if ($db->getBannerIdByOrden($orden_post)) {
+                    $db->shiftBannersOrden($orden_post);
                 }
-
-                $sql = "INSERT INTO fmru_banners (titulo, subtitulo, imagen_url, orden, activo) VALUES (?, ?, ?, ?, ?)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$titulo_post, $subtitulo_post, $imagen_final, $orden_post, $activo_post]);
+                $db->insertBanner($titulo_post, $subtitulo_post, $imagen_final, $orden_post, $activo_post);
                 $mensaje = 'Banner creado exitosamente.';
-                
-                // Limpieza
-                $titulo_post = ''; 
-                $subtitulo_post = ''; 
+                $titulo_post = '';
+                $subtitulo_post = '';
                 $activo_post = 1;
-                $imagen_url_actual = ''; 
-                
-                // Recalcular orden futuro
-                $stmtMax = $pdo->query("SELECT MAX(orden) FROM fmru_banners");
-                $maxOrdenPost = $stmtMax->fetchColumn();
+                $imagen_url_actual = '';
+
+                $maxOrdenPost = $db->getMaxOrdenBanner();
                 $orden_post = $maxOrdenPost ? (int)$maxOrdenPost + 1 : 1;
             }
-            
-            $pdo->commit(); 
+
+            $db->commit();
             $tipo_mensaje = 'success';
-            
             $titulo = $titulo_post;
             $subtitulo = $subtitulo_post;
             $orden = $orden_post;
             $activo = $activo_post;
 
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-            $mensaje = "Error en base de datos al guardar: " . e($e->getMessage());
+        } catch (RuntimeException $e) {
+            $db->rollBack();
+            $mensaje = $e->getMessage();
+            $tipo_mensaje = 'danger';
+        } catch (Throwable $e) {
+            $db->rollBack();
+            $mensaje = 'Error en base de datos al guardar el banner.';
             $tipo_mensaje = 'danger';
         }
+    }
+
+    if ($tipo_mensaje === 'danger') {
+        $titulo    = $titulo_post;
+        $subtitulo = $subtitulo_post;
+        $orden     = $orden_post;
+        $activo    = $activo_post;
     }
 }
 ?>
@@ -179,57 +114,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $custom_title ?> | Admin FMRU</title>
+    <title><?= e($custom_title) ?> | Admin FMRU</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- CSS Centralizado -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="css/admin.css" rel="stylesheet">
 </head>
 <body class="admin-panel">
 
 <div class="d-flex">
-    
     <?php include __DIR__ . '/partials/sidebar.php'; ?>
 
     <div class="flex-grow-1">
-        
         <?php include __DIR__ . '/partials/topbar.php'; ?>
 
         <div class="container-fluid p-4">
-            
             <div class="mb-4">
                 <a href="ver_banners.php" class="btn btn-light border btn-sm shadow-sm">
-                    <i class="bi bi-arrow-left"></i> Volver a la lista
+                    <i class="bi bi-arrow-left"></i> Volver al listado
                 </a>
             </div>
 
-            <?php if ($mensaje): ?>
-                <div class="alert alert-<?= $tipo_mensaje ?> alert-dismissible fade show shadow-sm" role="alert">
-                    <?= $mensaje ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <?php if ($mensaje !== ''): ?>
+                <?php $clase_alerta = in_array($tipo_mensaje, ['success', 'danger', 'warning', 'info'], true) ? $tipo_mensaje : 'info'; ?>
+                <div class="alert alert-<?= $clase_alerta ?> alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+                    <i class="bi <?= $clase_alerta === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill' ?> me-2 fs-5"></i>
+                    <div><?= e($mensaje) ?></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
             <?php endif; ?>
 
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="form-card">
-                        <form method="POST" enctype="multipart/form-data">
-                            
+                        <form method="POST" action="" enctype="multipart/form-data">
+                            <?= csrf_campo() ?>
+
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark">Título Principal</label>
                                 <input type="text" name="titulo" class="form-control" value="<?= e($titulo) ?>" required maxlength="150" placeholder="Ej. La Fuerza de las Serpientes">
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark">Subtítulo (Opcional)</label>
                                 <input type="text" name="subtitulo" class="form-control" value="<?= e($subtitulo) ?>" maxlength="255" placeholder="Ej. Apoya a nuestras selecciones...">
                             </div>
 
                             <div class="row mb-4">
-                                <div class="col-md-6">
+                                <div class="col-md-6 mb-3 mb-md-0">
                                     <label class="form-label fw-bold text-dark">Orden de Aparición</label>
-                                    <input type="number" name="orden" class="form-control" value="<?= e($orden) ?>" min="1">
+                                    <input type="number" name="orden" class="form-control" value="<?= (int)$orden ?>" min="1" required>
                                     <div class="form-text">Si cambias el número, los demás se reordenarán.</div>
                                 </div>
                                 <div class="col-md-6 d-flex align-items-end">
@@ -244,18 +178,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <div class="mb-4">
                                 <label class="form-label fw-bold text-dark">Imagen del Banner</label>
-    
+
                                 <?php if ($imagen_url_actual): ?>
                                     <div class="mb-3 text-center bg-light p-3 rounded border overflow-hidden">
                                         <p class="text-muted small mb-2 fw-bold text-uppercase">Imagen Actual</p>
-                                        <!-- Clases corregidas para evitar desbordamiento -->
                                         <img src="../<?= e($imagen_url_actual) ?>" alt="Banner Actual" class="current-image-banner img-fluid shadow-sm border">
                                     </div>
                                 <?php endif; ?>
-                                
+
                                 <input class="form-control" type="file" name="imagen" id="imagenFile" accept="image/jpeg, image/png, image/webp" <?= !$id ? 'required' : '' ?>>
                                 <div class="form-text">
-                                    <span class="text-danger fw-bold"><?= $id ? 'Sube una nueva imagen solo si deseas reemplazar la actual.' : 'Requerido.' ?></span> 
+                                    <span class="text-danger fw-bold"><?= $id ? 'Sube una nueva imagen solo si deseas reemplazar la actual.' : 'Requerido.' ?></span>
                                     Formatos: JPG, PNG, WEBP. Max: 2MB. Dimensiones recomendadas: 1920x1080 px.
                                 </div>
                             </div>
@@ -265,7 +198,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <i class="bi bi-save me-2"></i> Guardar Banner
                                 </button>
                             </div>
-
                         </form>
                     </div>
                 </div>
@@ -275,11 +207,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    <?php if ($tipo_mensaje === 'success' && !$id): ?>
-        document.getElementById('imagenFile').value = '';
-    <?php endif; ?>
-</script>
+<!-- <script>if(!window.bootstrap){document.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"><\/script>');}</script> -->
 </body>
 </html>

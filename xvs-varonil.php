@@ -1,7 +1,7 @@
 <?php
 /**
- * FEDERACIÓN MEXICANA DE RUGBY - SELECCIÓN VARONIL XVs (SERPIENTES)
- * Diseño Élite (Modo Oscuro) - OWASP Compliance
+ * FEDERACIÓN MEXICANA DE RUGBY - LIGA XVS VARONIL
+ * Diseño Moderno - OWASP Compliance
  */
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1); 
@@ -9,120 +9,115 @@ ini_set('session.use_only_cookies', 1);
 session_start();
 
 require_once __DIR__ . '/admin/config/db.php';
+global $db;
 
-// 1. Datos del Roster
-$seleccionados = [
-    ["nombre" => "Max Douek", "foto" => "assets/img/users/rugby_avatar_04.png", "posicion" => "Forward"],
-    ["nombre" => "Alejandro Pradilla", "foto" => "assets/img/users/rugby_avatar_04.png", "posicion" => "Back"],
-    ["nombre" => "Jorge Cortés", "foto" => "assets/img/users/rugby_avatar_04.png", "posicion" => "Forward"],
-    ["nombre" => "Manuel Garrido", "foto" => "assets/img/users/rugby_avatar_04.png", "posicion" => "Back"]
+$settings = $db->getAllSettings();
+
+// 1. Equipos Participantes (Dinámicos desde BD)
+$equipos_xvs = json_decode($settings['xvsv_clubes'] ?? '[]', true) ?: [];
+
+// 2. Histórico de Campeonatos (Salón de la Fama - En código por el momento)
+$historico_campeones = [
+    ["temporada" => "2024 - 2025", "campeon" => "Black Thunder RC", "subcampeon" => "Pumas UNAM", "mvp" => "Víctor Año"],
+    ["temporada" => "2023 - 2024", "campeon" => "Pumas UNAM", "subcampeon" => "Wallabies RC", "mvp" => "Miguel Carner"],
+    ["temporada" => "2022 - 2023", "campeon" => "Black Thunder RC", "subcampeon" => "Lobos Occidente", "mvp" => "Pablo Testas"],
+    ["temporada" => "2021 - 2022", "campeon" => "Wallabies RC", "subcampeon" => "Tazmania RC", "mvp" => "Arturo Maltos"]
 ];
 
-// 2. Staff Técnico
-$staff = [
-    ["rol" => "Head Coach", "nombre" => "Rubén Duque", "icono" => "bi-person-vcard"],
-    ["rol" => "Prep. Físico", "nombre" => "Franco Garcia", "icono" => "bi-activity"],
-    ["rol" => "Médico", "nombre" => "Cristóbal Flores", "icono" => "bi-heart-pulse"]
-];
-
-// 3. Histórico de CAPS
-$historico = [
-    ["nombre" => "Miguel Carner", "caps" => "35", "status" => "Leyenda"],
-    ["nombre" => "Víctor Año", "caps" => "28", "status" => "Veterano"],
-    ["nombre" => "Pablo Testas", "caps" => "22", "status" => "Activo"]
-];
-
-$page_title = "Selección Varonil XVs"; 
+$page_title = "Liga XVs Varonil"; 
 include 'includes/head.php';
 include 'includes/navbar.php'; 
 ?>
-    <!-- SECCIÓN OSCURA GLOBAL -->
-    <div style="background-color: #111111; color: white;">
 
-        <!-- HERO SERPIENTES -->
-        <header class="position-relative" style="background-image: url('assets/img/banner/Mesa-de-trabajo-25.png'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
-            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(17,17,17,0.4) 0%, #111111 100%);"></div>
-            <div class="container position-relative z-2 text-center pt-5">
-                <div class="glass-panel-dark d-inline-block px-5 py-4">
-                    <span class="badge bg-danger mb-3 px-4 py-2 fs-6 fw-bold text-uppercase" style="letter-spacing: 3px;">Las Serpientes</span>
-                    <h1 class="display-3 fw-bolder text-uppercase mb-0 text-white" style="letter-spacing: -1px;">XV Varonil</h1>
+    <!-- HERO EFECTO CRISTAL DINÁMICO -->
+    <header class="position-relative" style="background-color: var(--verde-oscuro); background-image: url('<?= e($settings['xvsv_hero_img'] ?? 'assets/img/banner/Mesa-de-trabajo-25.png') ?>'); background-size: cover; background-position: center; min-height: 60vh; display: flex; align-items: center;">
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.3);"></div>
+        <div class="container position-relative z-2">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="glass-panel text-white shadow-lg">
+                        <span class="badge bg-success mb-3 px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 2px;">
+                            <?= e($settings['xvsv_hero_badge'] ?? 'Competencias') ?>
+                        </span>
+                        <h1 class="display-3 fw-bold text-uppercase mb-3 text-shadow">
+                            <?= e($settings['xvsv_hero_titulo'] ?? 'Liga XVs Varonil') ?>
+                        </h1>
+                        <p class="lead mb-0 fw-semibold opacity-75">
+                            <?= e($settings['xvsv_hero_sub'] ?? 'La máxima categoría del rugby union varonil en México.') ?>
+                        </p>
+                    </div>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <main class="container py-5">
-            
-            <!-- ROSTER DE JUGADORES (Tarjetas PRO) -->
-            <section class="mb-5 pb-5">
-                <div class="d-flex justify-content-between align-items-end mb-5 border-bottom border-dark pb-3">
-                    <h2 class="fw-bold text-uppercase text-white mb-0">Roster <span style="color: var(--rojo-institucional);">Oficial</span></h2>
+    <main class="container my-5 pb-5">
+        
+        <!-- INTRODUCCIÓN (HTML ENRIQUECIDO) -->
+        <section class="row mb-5 justify-content-center text-center">
+            <div class="col-lg-8">
+                <div class="fs-5 text-muted" style="line-height: 1.8;">
+                    <?= $settings['xvsv_intro'] ?? '<p>Reuniendo a los clubes más competitivos del país en la Primera Fuerza Nacional.</p>' ?>
                 </div>
-                
-                <div class="row g-4 justify-content-center">
-                    <?php foreach($seleccionados as $jugador): ?>
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                        <div class="pro-player-card shadow-lg">
-                            <!-- FIX: Etiqueta img limpia para que el CSS tome el control total -->
-                            <img src="<?= e($jugador['foto']) ?>" class="pro-player-img" alt="<?= e($jugador['nombre']) ?>">
+            </div>
+        </section>
+
+        <!-- CLUBES: GRID MODERNO DINÁMICO -->
+        <section class="mb-5 pb-5 border-bottom border-secondary border-opacity-25">
+            <h3 class="fw-bold text-uppercase mb-5 text-center" style="color: var(--verde-principal); letter-spacing: 1px;">Clubes Participantes</h3>
+            
+            <div class="row g-4 justify-content-center">
+                <?php foreach($equipos_xvs as $equipo): ?>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="club-card-modern p-4 text-center h-100">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3 border" style="width: 80px; height: 80px; font-size: 2rem; color: var(--verde-principal); font-weight: 900;">
+                            <?= e($equipo['logo'] ?? mb_strtoupper(mb_substr($equipo['nombre'], 0, 1, 'UTF-8'), 'UTF-8')) ?>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1"><?= e($equipo['nombre']) ?></h5>
+                        <span class="badge bg-light text-secondary border px-3 py-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i> <?= e($equipo['estado']) ?></span>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+
+        <!-- SALÓN DE LA FAMA (Timeline/Leaderboard - En código) -->
+        <section class="mb-5">
+            <div class="text-center mb-5">
+                <h3 class="fw-bold text-uppercase" style="color: var(--rojo-institucional); letter-spacing: 1px;">Salón de la Fama</h3>
+                <p class="text-muted">Los campeones que han forjado nuestra historia.</p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <?php foreach($historico_campeones as $index => $historia): ?>
+                    <div class="honor-row">
+                        <div class="d-flex align-items-center gap-4 w-100">
+                            <!-- Trofeo / Año -->
+                            <div class="text-center border-end pe-4" style="min-width: 120px;">
+                                <i class="bi bi-trophy-fill fs-4 <?= $index === 0 ? 'text-warning' : 'text-secondary opacity-50' ?>"></i>
+                                <div class="fw-bold text-dark mt-1"><?= e($historia['temporada']) ?></div>
+                            </div>
                             
-                            <div class="pro-player-info text-center">
-                                <span class="badge text-uppercase mb-2" style="background-color: var(--rojo-institucional); letter-spacing: 1px;"><?= e($jugador['posicion']) ?></span>
-                                <h4 class="fw-bold text-white mb-0"><?= e($jugador['nombre']) ?></h4>
+                            <!-- Campeón y Subcampeón -->
+                            <div class="flex-grow-1">
+                                <h4 class="fw-bold mb-1" style="color: var(--verde-principal);"><?= e($historia['campeon']) ?> <i class="bi bi-patch-check-fill ms-1 text-primary fs-6"></i></h4>
+                                <div class="text-muted small">Subcampeón: <strong><?= e($historia['subcampeon']) ?></strong></div>
+                            </div>
+                            
+                            <!-- MVP -->
+                            <div class="text-end d-none d-md-block">
+                                <div class="text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">MVP Final</div>
+                                <div class="fw-semibold text-dark"><i class="bi bi-star-fill text-warning me-1"></i> <?= e($historia['mvp']) ?></div>
                             </div>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- STAFF Y CAPS (Dividido en dos columnas) -->
-            <section class="row g-5 mb-5 pb-5">
-                
-                <!-- STAFF TÉCNICO -->
-                <div class="col-lg-5">
-                    <h3 class="fw-bold text-uppercase mb-4" style="color: var(--verde-claro);">Cuerpo Técnico</h3>
-                    <div class="d-flex flex-column gap-3">
-                        <?php foreach($staff as $miembro): ?>
-                        <div class="d-flex align-items-center bg-dark rounded-3 p-3 border border-secondary border-opacity-25">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(255,255,255,0.05);">
-                                <i class="bi <?= e($miembro['icono']) ?> fs-3" style="color: var(--verde-claro);"></i>
-                            </div>
-                            <div>
-                                <div class="text-uppercase small text-white-50 fw-bold tracking-wide"><?= e($miembro['rol']) ?></div>
-                                <h5 class="text-white mb-0"><?= e($miembro['nombre']) ?></h5>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-                <!-- LÍDERES DE CAPS (HISTÓRICO) -->
-                <div class="col-lg-7">
-                    <h3 class="fw-bold text-uppercase mb-4" style="color: var(--rojo-institucional);">Líderes de Caps</h3>
-                    
-                    <div class="d-flex flex-column gap-2">
-                        <?php foreach($historico as $index => $jugador): ?>
-                        <div class="honor-row honor-row-dark">
-                            <div class="d-flex align-items-center gap-3 w-100">
-                                <h4 class="mb-0 text-white-50 fw-bold" style="width: 30px;">#<?= $index + 1 ?></h4>
-                                <div class="flex-grow-1">
-                                    <h5 class="text-white fw-bold mb-1"><?= e($jugador['nombre']) ?></h5>
-                                    <span class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-50"><?= e($jugador['status']) ?></span>
-                                </div>
-                                <div class="text-end">
-                                    <div class="display-6 fw-bolder" style="color: var(--verde-claro); line-height: 1;"><?= e($jugador['caps']) ?></div>
-                                    <div class="text-uppercase small text-white-50 fw-bold" style="letter-spacing: 1px;">Tests</div>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-            </section>
-
-        </main>
-    </div>
+    </main>
 
     <?php include 'includes/footer.php'; ?>
 </body>

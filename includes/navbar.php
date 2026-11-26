@@ -26,21 +26,23 @@ if (basename($_SERVER['PHP_SELF']) == 'navbar.php') {
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Competencias</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="xvs-varonil.php">XVs Varonil</a></li>
-                        <li><a class="dropdown-item" href="xvs-femenil.php">XVs Femenil</a></li>
-                        <li><a class="dropdown-item" href="game-on.php">Game On</a></li>
-                        <li><a class="dropdown-item" href="escolares-universitarios.php">Escolares / Universitarios</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Serpientes</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="spt-femenil.php">Femenil</a></li>
                         <li><a class="dropdown-item" href="spt-varonil.php">Varonil</a></li>
                     </ul>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Competencias</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="xvs-varonil.php">XVs Varonil</a></li>
+                        <li><a class="dropdown-item" href="xvs-femenil.php">XVs Femenil</a></li>
+                        <li><a class="dropdown-item" href="game-on.php">Game On</a></li>
+                        <li><a class="dropdown-item" href="escolares-universitarios.php">Estudiantiles</a></li>
+                        <li><a class="dropdown-item" href="rugby-7s.php">Rugby 7s</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="desarrollo.php">Desarrollo</a></li>
                 <li class="nav-item"><a class="nav-link" href="documentos.php">Documentos</a></li>
             </ul>
             <div class="d-flex">

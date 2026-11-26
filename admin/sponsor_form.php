@@ -1,171 +1,137 @@
 <?php
 // admin/sponsor_form.php
-session_start();
-
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: index.php");
-    exit;
-}
-
+require_once __DIR__ . '/config/seguridad.php';
+exigir_sesion_admin();
 require_once __DIR__ . '/config/db.php';
+global $db;
 
-if (!function_exists('e')) {
-    function e($string) { return htmlspecialchars((string)$string, ENT_QUOTES | ENT_HTML5, 'UTF-8'); }
-}
-
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$id = isset($_GET['id']) ? max(0, (int)$_GET['id']) : 0;
 $accion = $id ? 'Editar' : 'Agregar';
 $custom_title = "$accion Sponsor";
 
-$mensaje = ''; $tipo_mensaje = '';
+$mensaje = '';
+$tipo_mensaje = '';
 
-// Variables por defecto
-$nombre = ''; 
-$enlace = '#'; 
-$nivel = 'Proveedor Oficial'; 
-$activo = 1; 
+$niveles_permitidos = ['Patrocinador Principal', 'Socio Técnico', 'Proveedor Oficial'];
+$nombre = '';
+$enlace = '#';
+$nivel = 'Proveedor Oficial';
+$activo = 1;
 $imagen_url_actual = '';
 
-// Lógica para obtener el último orden al cargar la página por primera vez
 if (!$id) {
-    $stmtMax = $pdo->query("SELECT MAX(orden) FROM fmru_sponsors");
-    $max_val = $stmtMax->fetchColumn();
+    $max_val = $db->getMaxOrdenSponsor();
     $orden = $max_val ? (int)$max_val + 1 : 1;
 } else {
-    $orden = 0; 
-}
-
-// Cargar datos si es edición
-if ($id) {
-    $stmt = $pdo->prepare("SELECT * FROM fmru_sponsors WHERE id = ?");
-    $stmt->execute([$id]);
-    $sponsor = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    $sponsor = $db->getSponsorById($id);
     if ($sponsor) {
-        $nombre = $sponsor['nombre'];
-        $enlace = $sponsor['enlace'];
-        $nivel = $sponsor['nivel'] ?? 'Proveedor Oficial';
-        $orden = (int)$sponsor['orden']; // Se sobreescribe con el orden real del registro
-        $activo = $sponsor['activo'];
+        $nombre            = $sponsor['nombre'];
+        $enlace            = $sponsor['enlace'];
+        $nivel             = in_array($sponsor['nivel'] ?? '', $niveles_permitidos, true) ? $sponsor['nivel'] : 'Proveedor Oficial';
+        $orden             = (int)$sponsor['orden'];
+        $activo            = (int)$sponsor['activo'];
         $imagen_url_actual = $sponsor['imagen_url'];
     } else {
-        header("Location: ver_sponsors.php"); exit;
+        header('Location: ver_sponsors.php');
+        exit;
     }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitización OWASP
-    $nombre_post = trim($_POST['nombre'] ?? '');
-    
-    $enlace_post = trim($_POST['enlace'] ?? '#');
-    if (empty($enlace_post) || $enlace_post === 'http://' || $enlace_post === 'https://') {
-        $enlace_post = '#';
-    }
-    
-    $niveles_permitidos = ['Patrocinador Principal', 'Socio Técnico', 'Proveedor Oficial'];
-    $nivel_post = in_array($_POST['nivel'] ?? '', $niveles_permitidos) ? $_POST['nivel'] : 'Proveedor Oficial';
-    
-    // Lógica Automática: Si es Principal, no rota (0). Si es otro, rota (1).
+    $nombre_post = recibir_post('nombre');
+    $enlace_raw  = trim((string)($_POST['enlace'] ?? '#'));
+    $nivel_raw   = recibir_post('nivel');
+    $nivel_post  = in_array($nivel_raw, $niveles_permitidos, true) ? $nivel_raw : 'Proveedor Oficial';
     $rotativo_post = ($nivel_post === 'Patrocinador Principal') ? 0 : 1;
-    
-    $orden_post = (int)$_POST['orden'];
+    $orden_post  = max(1, (int)($_POST['orden'] ?? 1));
     $activo_post = isset($_POST['activo']) ? 1 : 0;
-    
     $imagen_final = $imagen_url_actual;
 
-    // Validación segura de imagen
-    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['imagen']['tmp_name'];
-        $fileName = $_FILES['imagen']['name'];
-        $fileSize = $_FILES['imagen']['size'];
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        
-        $image_info = getimagesize($fileTmpPath);
-        $is_valid_image = false;
-        
-        if ($fileExtension === 'svg') {
-            $mime = mime_content_type($fileTmpPath);
-            if ($mime === 'image/svg+xml') $is_valid_image = true;
-        } elseif ($image_info !== false) {
-            $is_valid_image = true;
-        }
-
-        if ($is_valid_image) {
-            if ($fileSize < 2 * 1024 * 1024) { 
-                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-                $uploadFileDir = dirname(__DIR__) . '/assets/img/sponsors/';
-                if (!is_dir($uploadFileDir)) mkdir($uploadFileDir, 0755, true);
-
-                if (move_uploaded_file($fileTmpPath, $uploadFileDir . $newFileName)) {
-                    $imagen_final = 'assets/img/sponsors/' . $newFileName;
-                } else {
-                    $mensaje = 'Error al guardar el logo.'; $tipo_mensaje = 'danger';
-                }
-            } else {
-                $mensaje = 'El logo supera el límite de 2MB.'; $tipo_mensaje = 'danger';
-            }
+    // OWASP: Validar enlace externo permitiendo únicamente '#' o esquemas http/https
+    if ($enlace_raw === '' || $enlace_raw === '#' || $enlace_raw === 'http://' || $enlace_raw === 'https://') {
+        $enlace_post = '#';
+    } else {
+        $esquema = strtolower((string)parse_url($enlace_raw, PHP_URL_SCHEME));
+        if (filter_var($enlace_raw, FILTER_VALIDATE_URL) && in_array($esquema, ['https', 'http'], true)) {
+            $enlace_post = $enlace_raw;
         } else {
-            $mensaje = 'Archivo inválido.'; $tipo_mensaje = 'danger';
-        }
-    } elseif (!$id && empty($_FILES['imagen']['name'])) {
-        $mensaje = 'Debes subir un logo.'; $tipo_mensaje = 'danger';
-    }
-
-    if (empty($mensaje)) {
-        try {
-            $pdo->beginTransaction();
-
-            if ($id) {
-                // Lógica Swap (Intercambio)
-                if ($orden !== $orden_post) {
-                    $stmtConflicto = $pdo->prepare("SELECT id FROM fmru_sponsors WHERE orden = ? AND id != ?");
-                    $stmtConflicto->execute([$orden_post, $id]);
-                    if ($id_conflicto = $stmtConflicto->fetchColumn()) {
-                        $pdo->prepare("UPDATE fmru_sponsors SET orden = ? WHERE id = ?")->execute([$orden, $id_conflicto]);
-                    }
-                }
-                $sql = "UPDATE fmru_sponsors SET nombre=?, enlace=?, nivel=?, rotativo=?, imagen_url=?, orden=?, activo=? WHERE id=?";
-                $pdo->prepare($sql)->execute([$nombre_post, $enlace_post, $nivel_post, $rotativo_post, $imagen_final, $orden_post, $activo_post, $id]);
-                $mensaje = 'Sponsor actualizado.';
-                $imagen_url_actual = $imagen_final;
-            } else {
-                // Lógica Shift (Desplazamiento)
-                $stmtConflicto = $pdo->prepare("SELECT id FROM fmru_sponsors WHERE orden = ?");
-                $stmtConflicto->execute([$orden_post]);
-                if ($stmtConflicto->fetchColumn()) {
-                    $pdo->prepare("UPDATE fmru_sponsors SET orden = orden + 1 WHERE orden >= ?")->execute([$orden_post]);
-                }
-                $sql = "INSERT INTO fmru_sponsors (nombre, enlace, nivel, rotativo, imagen_url, orden, activo) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                $pdo->prepare($sql)->execute([$nombre_post, $enlace_post, $nivel_post, $rotativo_post, $imagen_final, $orden_post, $activo_post]);
-                $mensaje = 'Sponsor creado exitosamente.';
-                
-                // Reiniciar los valores POST para limpiar el formulario de cara a un nuevo registro
-                $nombre_post = ''; 
-                $enlace_post = '#'; 
-                $nivel_post = 'Proveedor Oficial'; 
-                $activo_post = 1; 
-                $imagen_url_actual = '';
-                
-                // Calcular inteligentemente el próximo orden disponible post-inserción
-                $nuevoMax = $pdo->query("SELECT MAX(orden) FROM fmru_sponsors")->fetchColumn();
-                $orden_post = $nuevoMax ? (int)$nuevoMax + 1 : 1;
-            }
-            
-            $pdo->commit(); 
-            $tipo_mensaje = 'success';
-            
-            // Asignar los valores a las variables de la vista
-            $nombre = $nombre_post; 
-            $enlace = $enlace_post; 
-            $nivel = $nivel_post; 
-            $orden = $orden_post; 
-            $activo = $activo_post;
-            
-        } catch (PDOException $e) {
-            $pdo->rollBack(); 
-            $mensaje = "Error: " . $e->getMessage(); 
+            $enlace_post = $enlace_raw;
+            $mensaje = 'El enlace web debe iniciar con https:// o http://, o dejarse con "#".';
             $tipo_mensaje = 'danger';
         }
+    }
+
+    if (!validar_csrf()) {
+        $mensaje = 'Token de seguridad inválido. Intenta guardar nuevamente.';
+        $tipo_mensaje = 'danger';
+    } elseif ($nombre_post === '') {
+        $mensaje = 'El nombre de la empresa es obligatorio.';
+        $tipo_mensaje = 'danger';
+    }
+
+    if ($mensaje === '') {
+        try {
+            // El 4to parámetro en true habilita SVG con escaneo anti-XSS de seguridad.php
+            $nuevo_logo = procesar_imagen_segura('imagen', 'assets/img/sponsors', 'sponsor', true);
+            if ($nuevo_logo !== null) {
+                $imagen_final = $nuevo_logo;
+            } elseif (!$id) {
+                throw new RuntimeException('Debes subir un logotipo para el nuevo sponsor.');
+            }
+
+            $db->beginTransaction();
+
+            if ($id) {
+                if ($orden !== $orden_post) {
+                    $id_conflicto = $db->getSponsorIdByOrden($orden_post, $id);
+                    if ($id_conflicto) {
+                        $db->updateSponsorOrden($id_conflicto, $orden);
+                    }
+                }
+                $db->updateSponsor($id, $nombre_post, $enlace_post, $nivel_post, $rotativo_post, $imagen_final, $orden_post, $activo_post);
+                $mensaje = 'Sponsor actualizado correctamente.';
+                $imagen_url_actual = $imagen_final;
+            } else {
+                if ($db->getSponsorIdByOrden($orden_post)) {
+                    $db->shiftSponsorsOrden($orden_post);
+                }
+                $db->insertSponsor($nombre_post, $enlace_post, $nivel_post, $rotativo_post, $imagen_final, $orden_post, $activo_post);
+                $mensaje = 'Sponsor creado exitosamente.';
+
+                $nombre_post = '';
+                $enlace_post = '#';
+                $nivel_post = 'Proveedor Oficial';
+                $activo_post = 1;
+                $imagen_url_actual = '';
+                $nuevoMax = $db->getMaxOrdenSponsor();
+                $orden_post = $nuevoMax ? (int)$nuevoMax + 1 : 1;
+            }
+
+            $db->commit();
+            $tipo_mensaje = 'success';
+            $nombre = $nombre_post;
+            $enlace = $enlace_post;
+            $nivel  = $nivel_post;
+            $orden  = $orden_post;
+            $activo = $activo_post;
+
+        } catch (RuntimeException $e) {
+            $db->rollBack();
+            $mensaje = $e->getMessage();
+            $tipo_mensaje = 'danger';
+        } catch (Throwable $e) {
+            $db->rollBack();
+            $mensaje = 'Error en base de datos al guardar el sponsor.';
+            $tipo_mensaje = 'danger';
+        }
+    }
+
+    if ($tipo_mensaje === 'danger') {
+        $nombre = $nombre_post;
+        $enlace = $enlace_post;
+        $nivel  = $nivel_post;
+        $orden  = $orden_post;
+        $activo = $activo_post;
     }
 }
 ?>
@@ -173,10 +139,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title><?= $custom_title ?> | Admin FMRU</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= e($custom_title) ?> | Admin FMRU</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="css/admin.css" rel="stylesheet">
 </head>
 <body class="admin-panel">
@@ -185,28 +152,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="flex-grow-1">
         <?php include __DIR__ . '/partials/topbar.php'; ?>
         <div class="container-fluid p-4">
-            <div class="mb-4"><a href="ver_sponsors.php" class="btn btn-light border btn-sm shadow-sm"><i class="bi bi-arrow-left"></i> Volver a la lista</a></div>
-            
-            <?php if ($mensaje): ?>
-                <div class="alert alert-<?= $tipo_mensaje ?> alert-dismissible fade show shadow-sm">
-                    <?= $mensaje ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="mb-4">
+                <a href="ver_sponsors.php" class="btn btn-light border btn-sm shadow-sm">
+                    <i class="bi bi-arrow-left"></i> Volver al listado
+                </a>
+            </div>
+
+            <?php if ($mensaje !== ''): ?>
+                <?php $clase_alerta = in_array($tipo_mensaje, ['success', 'danger', 'warning', 'info'], true) ? $tipo_mensaje : 'info'; ?>
+                <div class="alert alert-<?= $clase_alerta ?> alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+                    <i class="bi <?= $clase_alerta === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill' ?> me-2 fs-5"></i>
+                    <div><?= e($mensaje) ?></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
             <?php endif; ?>
 
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="form-card">
-                        <form method="POST" enctype="multipart/form-data">
-                            
+                        <form method="POST" action="" enctype="multipart/form-data">
+                            <?= csrf_campo() ?>
+
                             <div class="row mb-3">
-                                <div class="col-md-6">
+                                <div class="col-md-6 mb-3 mb-md-0">
                                     <label class="form-label fw-bold text-dark">Nombre de la Empresa</label>
                                     <input type="text" name="nombre" class="form-control" value="<?= e($nombre) ?>" required maxlength="100">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-dark">Enlace Web (URL)</label>
-                                    <input type="text" name="enlace" class="form-control" value="<?= e($enlace) ?>" placeholder="https://www.ejemplo.com">
+                                    <input type="text" name="enlace" class="form-control" value="<?= e($enlace) ?>" maxlength="255" placeholder="https://www.ejemplo.com">
                                     <div class="form-text">Si no tiene sitio, déjalo vacío o con "#"</div>
                                 </div>
                             </div>
@@ -226,9 +200,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
 
                             <div class="row mb-4">
-                                <div class="col-md-6">
+                                <div class="col-md-6 mb-3 mb-md-0">
                                     <label class="form-label fw-bold text-dark">Orden de Aparición</label>
-                                    <input type="number" name="orden" class="form-control" value="<?= e($orden) ?>" min="1">
+                                    <input type="number" name="orden" class="form-control" value="<?= (int)$orden ?>" min="1" required>
                                     <div class="form-text">Calculado automáticamente al agregar nuevos.</div>
                                 </div>
                                 <div class="col-md-6 d-flex align-items-end">
@@ -245,16 +219,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label class="form-label fw-bold text-dark">Logo del Patrocinador</label>
                                 <?php if ($imagen_url_actual): ?>
                                     <div class="mb-3 text-center bg-light p-3 rounded border">
-                                        <img src="../<?= e($imagen_url_actual) ?>" class="current-image-sponsor shadow-sm">
+                                        <img src="../<?= e($imagen_url_actual) ?>" class="current-image-sponsor shadow-sm" alt="Logo Sponsor">
                                     </div>
                                 <?php endif; ?>
                                 <input class="form-control" type="file" name="imagen" id="imagenFile" accept="image/jpeg, image/png, image/webp, image/svg+xml" <?= !$id ? 'required' : '' ?>>
-                                <div class="form-text"><span class="text-danger fw-bold"><?= $id ? 'Opcional.' : 'Requerido.' ?></span> Formatos: PNG, JPG, SVG. Max: 2MB.</div>
+                                <div class="form-text"><span class="text-danger fw-bold"><?= $id ? 'Opcional.' : 'Requerido.' ?></span> Formatos: PNG, JPG, WEBP, SVG. Max: 2MB.</div>
                             </div>
 
                             <div class="d-grid gap-2 mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg shadow-sm" style="background-color: #116436; border-color: #116436;">
-                                    Guardar Sponsor
+                                    <i class="bi bi-save me-2"></i> Guardar Sponsor
                                 </button>
                             </div>
                         </form>
@@ -264,10 +238,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Limpia el input de archivo después de agregar uno nuevo exitosamente
-    <?php if ($tipo_mensaje === 'success' && !$id): ?> document.getElementById('imagenFile').value = ''; <?php endif; ?>
-</script>
+<!-- <script>if(!window.bootstrap){document.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"><\/script>');}</script> -->
 </body>
 </html>
